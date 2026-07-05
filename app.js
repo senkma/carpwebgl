@@ -1518,10 +1518,6 @@ function switchLanguage(lang) {
     // Update UI texts
     const t = translations[lang];
 
-    // Logo subtitle
-    const logoSubtitle = document.querySelector('.logo-subtitle');
-    if (logoSubtitle) logoSubtitle.textContent = t.logoSubtitle;
-
     // Station cards
     const mendelCard = document.querySelector('.station-card[data-location="mendel"]');
     if (mendelCard) {
@@ -1538,10 +1534,6 @@ function switchLanguage(lang) {
         if (title) title.textContent = t.nelsonTitle;
         if (location) location.textContent = t.nelsonLocation;
     }
-
-    // Footer
-    const footerText = document.querySelector('.main-footer p');
-    if (footerText) footerText.textContent = t.footerText;
 
     // Controls help
     const controlItems = document.querySelectorAll('.control-item');

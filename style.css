@@ -775,22 +775,11 @@ body::after {
     left: 0;
     right: 0;
     padding: 18px 50px;
-    text-align: center;
     background: linear-gradient(0deg, var(--glass-vintage) 0%, transparent 25%);
     backdrop-filter: blur(8px);
-    font-size: 0.85rem;
-    color: #1a1a1a;
-    opacity: 1;
-    font-family: 'Georgia', serif;
-    font-style: normal;
     display: flex;
     align-items: center;
     justify-content: space-between;
-}
-
-.main-footer p {
-    margin: 0;
-    color: #1a1a1a;
 }
 
 /* Map Controls */
