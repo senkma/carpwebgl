@@ -36,7 +36,7 @@ body {
     position: relative;
 }
 
-/* Subtle overlay over wooden background for better readability */
+/* Světlejší overlay pro konzistentnější a světlejší pozadí */
 body::before {
     content: '';
     position: fixed;
@@ -44,16 +44,12 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(
-        to bottom,
-        rgba(244, 232, 208, 0.15),
-        rgba(224, 211, 181, 0.2)
-    );
+    background: rgba(244, 232, 208, 0.45);  /* Výrazně světlejší a konzistentnější overlay */
     pointer-events: none;
     z-index: 1;
 }
 
-/* Subtle vignette effect */
+/* Minimální vignette pro jemnou hloubku */
 body::after {
     content: '';
     position: fixed;
@@ -64,8 +60,7 @@ body::after {
     z-index: 1;
     pointer-events: none;
     box-shadow:
-        inset 0 0 200px rgba(45, 36, 22, 0.2),
-        inset 0 0 100px rgba(92, 74, 58, 0.1);
+        inset 0 0 150px rgba(92, 74, 58, 0.08);  /* Jemnější a světlejší vignette */
 }
 
 /* Loading Screen */
