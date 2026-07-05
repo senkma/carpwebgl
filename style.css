@@ -5,22 +5,98 @@
 }
 
 :root {
-    --primary-blue: #1e5a8e;
-    --accent-blue: #2196F3;
-    --accent-green: #4CAF50;
-    --dark-bg: #1a1f2e;
-    --glass-bg: rgba(26, 31, 46, 0.92);
-    --text-light: #e8eaf0;
-    --text-medium: #b0b5c0;
-    --card-hover: rgba(33, 150, 243, 0.12);
-    --border-color: rgba(100, 120, 150, 0.3);
+    /* Vintage cartographic color scheme */
+    --old-paper: #f4e8d0;
+    --aged-paper: #e8dcc0;
+    --parchment: #d4c5a0;
+    --sepia-dark: #5c4a3a;
+    --sepia-medium: #8b7355;
+    --sepia-light: #c9b18f;
+    --ink-black: #2d2416;
+    --ink-brown: #6b5244;
+    --compass-gold: #c9a961;
+    --ocean-vintage: #7ba5b5;
+    --land-vintage: #a89968;
+    --dark-bg: #1a1410;
+    --paper-overlay: rgba(244, 232, 208, 0.92);
+    --glass-vintage: rgba(92, 74, 58, 0.85);
+    --text-vintage: #3d3020;
+    --border-vintage: rgba(139, 115, 85, 0.6);
 }
 
 body {
-    font-family: 'Rajdhani', sans-serif;
+    font-family: 'Georgia', 'Times New Roman', serif;
     overflow: hidden;
-    background: linear-gradient(135deg, #1a1f2e 0%, #242b3d 50%, #1a1f2e 100%);
-    color: var(--text-light);
+    background: var(--old-paper);
+    color: var(--text-vintage);
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    opacity: 0.12;
+    background-image:
+        /* Antarctica main ice sheet - circular */
+        radial-gradient(circle 900px at 50% 55%, transparent 42%, var(--sepia-dark) 42.2%, var(--sepia-dark) 43%, transparent 43.2%),
+        /* Ross Ice Shelf (bottom right) */
+        radial-gradient(circle 250px at 62% 70%, transparent 45%, var(--sepia-medium) 45.5%, transparent 46%),
+        /* Ronne Ice Shelf (bottom left) */
+        radial-gradient(circle 280px at 38% 68%, transparent 45%, var(--sepia-medium) 45.5%, transparent 46%),
+        /* Antarctic Peninsula (pointing up-left) */
+        radial-gradient(ellipse 180px 350px at 35% 45%, transparent 48%, var(--sepia-dark) 48.5%, var(--sepia-dark) 49.5%, transparent 50%),
+        /* Transantarctic Mountains (line across) */
+        linear-gradient(125deg, transparent 49.3%, var(--sepia-light) 49.5%, var(--sepia-light) 50%, transparent 50.2%),
+        /* Latitude circles (parallels) */
+        radial-gradient(circle 600px at 50% 55%, transparent 49%, var(--sepia-light) 49.3%, transparent 49.6%),
+        radial-gradient(circle 800px at 50% 55%, transparent 49%, var(--sepia-light) 49.3%, transparent 49.6%),
+        radial-gradient(circle 1000px at 50% 55%, transparent 49%, var(--sepia-light) 49.3%, transparent 49.6%),
+        /* Meridian lines (longitude) */
+        repeating-conic-gradient(from 0deg at 50% 55%, transparent 0deg, transparent 14.9deg, var(--sepia-light) 15deg, transparent 15.1deg, transparent 29.9deg);
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+/* Add decorative compass rose */
+body::before {
+    content: '✤ ANTARCTICA ✤';
+    position: fixed;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Georgia', serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 6px;
+    color: var(--sepia-dark);
+    opacity: 0.25;
+    z-index: 0;
+    text-align: center;
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    /* Paper texture overlay */
+    background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(139, 115, 85, 0.02) 2px, rgba(139, 115, 85, 0.02) 4px),
+        repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(107, 82, 68, 0.015) 2px, rgba(107, 82, 68, 0.015) 4px);
+    /* Age spots */
+    background-color: transparent;
+    box-shadow:
+        inset 0 0 200px rgba(139, 115, 85, 0.1),
+        inset 0 0 100px rgba(92, 74, 58, 0.05);
 }
 
 /* Loading Screen */
@@ -30,7 +106,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, #1a1f2e 0%, #242b3d 50%, #1a1f2e 100%);
+    background: var(--old-paper);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -51,11 +127,14 @@ body {
     width: 120px;
     height: 120px;
     margin: 0 auto 30px;
-    border: 4px solid rgba(33, 150, 243, 0.2);
-    border-top: 4px solid var(--accent-blue);
+    border: 5px solid var(--sepia-medium);
+    border-top: 5px solid var(--compass-gold);
     border-radius: 50%;
-    animation: spin 2s linear infinite;
-    box-shadow: 0 0 30px rgba(33, 150, 243, 0.3);
+    animation: spin 3s linear infinite;
+    box-shadow:
+        0 0 0 2px var(--sepia-dark),
+        0 0 30px rgba(201, 169, 97, 0.3),
+        inset 0 0 20px rgba(0, 0, 0, 0.3);
 }
 
 @keyframes spin {
@@ -64,12 +143,16 @@ body {
 }
 
 .loading-title {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 4rem;
+    font-family: 'Georgia', serif;
+    font-size: 5rem;
     font-weight: 700;
-    color: var(--accent-blue);
-    margin-bottom: 10px;
-    letter-spacing: 8px;
+    color: var(--compass-gold);
+    margin-bottom: 15px;
+    letter-spacing: 18px;
+    text-shadow:
+        2px 2px 0px var(--sepia-dark),
+        0 0 20px rgba(201, 169, 97, 0.6);
+    font-style: italic;
 }
 
 @keyframes shimmer {
@@ -77,38 +160,46 @@ body {
 }
 
 .loading-subtitle {
-    font-size: 1.2rem;
-    color: var(--text-light);
-    margin-bottom: 30px;
-    letter-spacing: 3px;
+    font-size: 1rem;
+    color: var(--sepia-light);
+    margin-bottom: 35px;
+    letter-spacing: 6px;
     text-transform: uppercase;
+    font-weight: 400;
+    font-family: 'Georgia', serif;
 }
 
 .loading-bar {
-    width: 300px;
-    height: 4px;
-    background: rgba(255, 255, 255, 0.1);
+    width: 320px;
+    height: 6px;
+    background: var(--sepia-dark);
     margin: 20px auto;
-    border-radius: 2px;
+    border: 2px solid var(--sepia-medium);
+    border-radius: 0;
     overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 .loading-progress {
     height: 100%;
-    background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
-    border-radius: 2px;
+    background: linear-gradient(90deg, var(--compass-gold), var(--sepia-light));
+    border-radius: 0;
     transition: width 0.3s ease;
-    box-shadow: 0 0 10px var(--accent-blue);
+    box-shadow: 0 0 10px var(--compass-gold);
 }
 
 .loading-text {
-    color: var(--text-light);
-    font-size: 0.9rem;
-    margin-top: 10px;
-    opacity: 0.7;
+    color: var(--sepia-light);
+    font-size: 0.85rem;
+    margin-top: 15px;
+    opacity: 0.8;
+    font-family: 'Georgia', serif;
+    font-style: italic;
 }
 
-/* Canvas */
+
+
+/* Canvas - make sure it's above background */
 #globe-canvas {
     position: fixed;
     top: 0;
@@ -116,6 +207,7 @@ body {
     width: 100%;
     height: 100%;
     outline: none;
+    z-index: 2;
 }
 
 /* UI Overlay */
@@ -127,24 +219,27 @@ body {
     height: 100%;
     pointer-events: none;
     z-index: 100;
+    background: transparent;
 }
 
 #ui-overlay > * {
     pointer-events: auto;
 }
 
-/* Header */
+/* Header - Vintage atlas style */
 .main-header {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    padding: 20px 40px;
+    padding: 25px 50px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: linear-gradient(180deg, var(--glass-bg) 0%, transparent 100%);
-    backdrop-filter: blur(10px);
+    background: linear-gradient(180deg, var(--glass-vintage) 0%, transparent 100%);
+    backdrop-filter: blur(8px);
+    border-bottom: 3px double var(--compass-gold);
+    box-shadow: 0 2px 0 var(--sepia-dark);
 }
 
 .logo {
@@ -153,18 +248,26 @@ body {
 }
 
 .logo-carp {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 2rem;
+    font-family: 'Georgia', serif;
+    font-size: 2.8rem;
     font-weight: 700;
-    color: var(--accent-blue);
-    letter-spacing: 3px;
+    color: var(--compass-gold);
+    letter-spacing: 8px;
+    text-shadow:
+        2px 2px 0px var(--ink-black),
+        0 0 15px rgba(201, 169, 97, 0.5);
+    font-style: italic;
 }
 
 .logo-subtitle {
-    font-size: 0.7rem;
-    color: var(--text-medium);
-    letter-spacing: 2px;
+    font-size: 0.65rem;
+    color: var(--old-paper);
+    letter-spacing: 4px;
     text-transform: uppercase;
+    font-weight: 400;
+    margin-top: 5px;
+    font-family: 'Georgia', serif;
+    opacity: 0.9;
 }
 
 .main-nav {
@@ -174,24 +277,32 @@ body {
 }
 
 .nav-link, .nav-button {
-    padding: 10px 20px;
-    background: rgba(33, 150, 243, 0.15);
-    border: 1px solid var(--border-color);
-    color: var(--accent-blue);
+    padding: 12px 28px;
+    background: var(--parchment);
+    border: 3px solid var(--sepia-dark);
+    color: var(--ink-black);
     text-decoration: none;
-    font-size: 0.9rem;
-    border-radius: 4px;
+    font-size: 0.85rem;
+    border-radius: 0;
     transition: all 0.3s ease;
     cursor: pointer;
-    font-family: 'Rajdhani', sans-serif;
-    font-weight: 600;
+    font-family: 'Georgia', serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    box-shadow:
+        3px 3px 0 var(--sepia-dark),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .nav-link:hover, .nav-button:hover {
-    background: var(--accent-blue);
-    color: #ffffff;
-    border-color: var(--accent-blue);
-    transform: translateY(-2px);
+    background: var(--compass-gold);
+    color: var(--ink-black);
+    border-color: var(--ink-black);
+    box-shadow:
+        3px 3px 0 var(--ink-black),
+        0 0 20px rgba(201, 169, 97, 0.5);
+    transform: translate(-1px, -1px);
 }
 
 /* Location Cards */
@@ -207,11 +318,15 @@ body {
 }
 
 .location-card {
-    background: var(--glass-bg);
-    backdrop-filter: blur(15px);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 20px;
+    background: var(--paper-overlay);
+    backdrop-filter: blur(10px);
+    border: 4px double var(--sepia-dark);
+    border-radius: 0;
+    padding: 28px;
+    box-shadow:
+        5px 5px 0 var(--sepia-dark),
+        inset 0 0 30px rgba(139, 115, 85, 0.1);
+    position: relative;
     cursor: pointer;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
@@ -219,26 +334,32 @@ body {
 }
 
 .location-card::before {
-    content: '';
+    content: '✤';
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    background: var(--accent-blue);
-    opacity: 0;
-    transition: opacity 0.3s ease;
+    top: 10px;
+    left: 10px;
+    font-size: 1.2rem;
+    color: var(--compass-gold);
+    opacity: 0.4;
 }
 
-.location-card:hover::before {
-    opacity: 1;
+.location-card::after {
+    content: '✤';
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    font-size: 1.2rem;
+    color: var(--compass-gold);
+    opacity: 0.4;
 }
 
 .location-card:hover {
-    transform: translateX(-10px);
-    border-color: var(--accent-blue);
-    box-shadow: 0 8px 30px rgba(33, 150, 243, 0.25);
-    background: rgba(26, 31, 46, 0.95);
+    transform: translateX(-8px) translateY(-2px);
+    border-color: var(--compass-gold);
+    box-shadow:
+        7px 7px 0 var(--ink-black),
+        0 0 30px rgba(201, 169, 97, 0.4);
+    background: var(--aged-paper);
 }
 
 .card-icon {
@@ -247,25 +368,34 @@ body {
 }
 
 .location-card h3 {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 1.2rem;
+    font-family: 'Georgia', serif;
+    font-size: 1.4rem;
     font-weight: 700;
-    color: var(--accent-blue);
-    margin-bottom: 5px;
+    color: var(--ink-black);
+    margin-bottom: 10px;
+    text-transform: none;
+    letter-spacing: 0.5px;
+    font-style: italic;
+    border-bottom: 2px solid var(--sepia-medium);
+    padding-bottom: 6px;
 }
 
 .location-card p {
-    font-size: 0.9rem;
-    color: var(--text-light);
-    opacity: 0.8;
-    margin-bottom: 10px;
+    font-size: 0.95rem;
+    color: var(--text-vintage);
+    opacity: 0.9;
+    margin-bottom: 12px;
+    font-family: 'Georgia', serif;
+    line-height: 1.6;
 }
 
 .card-coords {
     font-family: 'Courier New', monospace;
-    font-size: 0.75rem;
-    color: var(--text-medium);
-    opacity: 0.7;
+    font-size: 0.7rem;
+    color: var(--sepia-dark);
+    opacity: 0.8;
+    font-weight: 600;
+    letter-spacing: 0.5px;
 }
 
 /* Info Panel */
@@ -274,14 +404,16 @@ body {
     left: 40px;
     top: 50%;
     transform: translateY(-50%);
-    max-width: 500px;
+    max-width: 540px;
     max-height: 70vh;
-    background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--border-color);
-    border-left: 3px solid var(--accent-blue);
-    border-radius: 15px;
-    padding: 30px;
+    background: var(--paper-overlay);
+    backdrop-filter: blur(8px);
+    border: 5px double var(--sepia-dark);
+    box-shadow:
+        8px 8px 0 var(--ink-black),
+        inset 0 0 40px rgba(139, 115, 85, 0.15);
+    border-radius: 0;
+    padding: 35px;
     overflow-y: auto;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -297,47 +429,62 @@ body {
     position: absolute;
     top: 15px;
     right: 15px;
-    background: rgba(100, 120, 150, 0.2);
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
+    background: rgba(42, 127, 98, 0.15);
+    border: 2px solid var(--border-color);
+    border-radius: 0;
     color: var(--text-medium);
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     cursor: pointer;
     transition: all 0.3s ease;
-    width: 35px;
-    height: 35px;
+    width: 36px;
+    height: 36px;
     line-height: 1;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-weight: 300;
 }
 
 .close-btn:hover {
-    background: var(--accent-blue);
+    background: var(--accent-teal);
     color: #ffffff;
-    border-color: var(--accent-blue);
+    border-color: var(--accent-teal);
 }
 
 .info-content h2 {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 1.8rem;
+    font-family: 'Georgia', serif;
+    font-size: 2.2rem;
     font-weight: 700;
-    color: var(--accent-blue);
+    color: var(--ink-black);
     margin-bottom: 15px;
+    text-transform: none;
+    letter-spacing: 1px;
+    border-bottom: 4px double var(--sepia-dark);
+    padding-bottom: 15px;
+    font-style: italic;
+    text-align: center;
 }
 
 .info-content h3 {
-    font-size: 1.3rem;
-    color: var(--text-light);
-    margin-top: 20px;
-    margin-bottom: 10px;
+    font-size: 1.4rem;
+    color: var(--sepia-dark);
+    margin-top: 25px;
+    margin-bottom: 12px;
+    font-family: 'Georgia', serif;
+    font-weight: 700;
+    font-style: italic;
+    border-left: 4px solid var(--compass-gold);
+    padding-left: 12px;
 }
 
 .info-content p {
-    line-height: 1.6;
-    margin-bottom: 15px;
-    color: var(--text-light);
-    opacity: 0.9;
+    line-height: 1.8;
+    margin-bottom: 16px;
+    color: var(--text-vintage);
+    opacity: 1;
+    font-family: 'Georgia', serif;
+    font-size: 1rem;
+    text-align: justify;
 }
 
 .info-content ul {
@@ -346,9 +493,11 @@ body {
 }
 
 .info-content li {
-    margin-bottom: 8px;
-    color: var(--text-light);
-    opacity: 0.9;
+    margin-bottom: 10px;
+    color: var(--text-vintage);
+    opacity: 1;
+    font-family: 'Georgia', serif;
+    line-height: 1.7;
 }
 
 .info-stats {
@@ -359,37 +508,61 @@ body {
 }
 
 .stat-item {
-    background: rgba(33, 150, 243, 0.08);
-    padding: 15px;
-    border-radius: 6px;
-    border: 1px solid var(--border-color);
+    background: var(--aged-paper);
+    padding: 18px;
+    border-radius: 0;
+    border: 3px solid var(--sepia-medium);
+    box-shadow:
+        inset 0 0 20px rgba(139, 115, 85, 0.1),
+        3px 3px 0 var(--sepia-dark);
 }
 
 .stat-label {
-    font-size: 0.75rem;
-    color: var(--text-medium);
+    font-size: 0.7rem;
+    color: var(--sepia-dark);
     text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 5px;
-    font-weight: 600;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    font-weight: 700;
+    font-family: 'Georgia', serif;
 }
 
 .stat-value {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     font-weight: 700;
-    color: #ffffff;
+    color: var(--ink-black);
+    font-family: 'Georgia', serif;
+    letter-spacing: 1px;
+    font-style: italic;
 }
 
-/* Controls Help */
+/* Controls Help - Vintage map legend */
 .controls-help {
     position: absolute;
     bottom: 80px;
     left: 40px;
-    background: var(--glass-bg);
-    backdrop-filter: blur(15px);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 15px 20px;
+    background: var(--paper-overlay);
+    backdrop-filter: blur(8px);
+    border: 4px double var(--sepia-dark);
+    border-radius: 0;
+    padding: 20px 28px;
+    box-shadow:
+        6px 6px 0 var(--ink-black),
+        inset 0 0 25px rgba(139, 115, 85, 0.12);
+}
+
+.controls-help::before {
+    content: '— LEGEND —';
+    display: block;
+    text-align: center;
+    font-size: 0.7rem;
+    color: var(--sepia-dark);
+    font-weight: 700;
+    letter-spacing: 3px;
+    margin-bottom: 12px;
+    font-family: 'Georgia', serif;
+    border-bottom: 2px solid var(--sepia-medium);
+    padding-bottom: 8px;
 }
 
 .control-item {
@@ -405,47 +578,57 @@ body {
 }
 
 .control-key {
-    color: var(--accent-blue);
+    color: var(--ink-black);
     font-weight: 700;
+    font-size: 0.85rem;
+    font-family: 'Georgia', serif;
 }
 
 .control-action {
-    color: var(--text-light);
-    opacity: 0.8;
+    color: var(--text-vintage);
+    opacity: 0.9;
+    font-family: 'Georgia', serif;
+    font-style: italic;
 }
 
-/* Footer */
+/* Footer - Vintage */
 .main-footer {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 20px 40px;
+    padding: 22px 50px;
     text-align: center;
-    background: linear-gradient(0deg, var(--glass-bg) 0%, transparent 100%);
-    backdrop-filter: blur(10px);
-    font-size: 0.85rem;
-    color: var(--text-light);
-    opacity: 0.7;
+    background: linear-gradient(0deg, var(--glass-vintage) 0%, transparent 100%);
+    backdrop-filter: blur(8px);
+    border-top: 3px double var(--compass-gold);
+    box-shadow: 0 -2px 0 var(--sepia-dark);
+    font-size: 0.8rem;
+    color: var(--old-paper);
+    opacity: 0.9;
+    font-family: 'Georgia', serif;
+    font-style: italic;
 }
 
-/* Scrollbar Styling */
+/* Scrollbar Styling - Vintage */
 .info-panel::-webkit-scrollbar {
-    width: 8px;
+    width: 10px;
 }
 
 .info-panel::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 4px;
+    background: var(--parchment);
+    border-radius: 0;
+    border: 1px solid var(--sepia-medium);
 }
 
 .info-panel::-webkit-scrollbar-thumb {
-    background: var(--accent-blue);
-    border-radius: 4px;
+    background: var(--sepia-dark);
+    border-radius: 0;
+    border: 1px solid var(--compass-gold);
 }
 
 .info-panel::-webkit-scrollbar-thumb:hover {
-    background: var(--accent-green);
+    background: var(--compass-gold);
 }
 
 /* Responsive Design */

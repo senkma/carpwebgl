@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CARP - Czech Antarctic Research Programme | Interactive Globe</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="map-background.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -24,6 +25,15 @@
             <p class="loading-text" id="loading-text">Initializing WebGL...</p>
         </div>
     </div>
+
+    <!-- Vintage Map Background Decorations -->
+    <div class="map-border"></div>
+    <div class="compass-rose"></div>
+    <div class="map-scale"></div>
+    <div class="map-coords coord-top">60° S</div>
+    <div class="map-coords coord-bottom">80° S</div>
+    <div class="map-coords coord-left">180° W</div>
+    <div class="map-coords coord-right">0°</div>
 
     <!-- Main Canvas -->
     <canvas id="globe-canvas"></canvas>

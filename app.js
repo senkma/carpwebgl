@@ -104,16 +104,15 @@ const locations = {
 function init() {
     updateLoadingProgress(10, 'Creating 3D scene...');
 
-    // Scene setup
+    // Scene setup with no fog (transparent background)
     scene = new THREE.Scene();
-    scene.fog = new THREE.Fog(0x0a0e27, 10, 50);
 
     // Camera setup
     const aspect = window.innerWidth / window.innerHeight;
     camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
     camera.position.set(0, 0, 8);
 
-    // Renderer setup
+    // Renderer setup with transparent background
     renderer = new THREE.WebGLRenderer({
         canvas: document.getElementById('globe-canvas'),
         antialias: true,
@@ -121,7 +120,7 @@ function init() {
     });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setClearColor(0x0a0e27, 1);
+    renderer.setClearColor(0x000000, 0); // Transparent background
 
     updateLoadingProgress(30, 'Building planet Earth...');
 
@@ -138,10 +137,10 @@ function init() {
     // Create location markers
     createMarkers();
 
-    updateLoadingProgress(70, 'Adding star field...');
+    updateLoadingProgress(70, 'Preparing vintage atmosphere...');
 
-    // Create stars
-    createStars();
+    // Stars removed for vintage look
+    // createStars();
 
     updateLoadingProgress(80, 'Setting up lights...');
 
@@ -241,6 +240,12 @@ function createGlobe() {
     });
 
     globe = new THREE.Mesh(geometry, material);
+
+    // Default rotation to show Antarctica (SOUTH Pole!)
+    // Need to flip to show the BOTTOM of the globe (South Pole)
+    globe.rotation.x = -Math.PI / 2;  // Flip DOWN to show South Pole (negative!)
+    globe.rotation.y = 0; // No Y rotation needed initially
+
     scene.add(globe);
 }
 
@@ -607,32 +612,33 @@ function createMarker(lat, lon, icon) {
 
     group.position.set(x, y, z);
 
-    // Marker pin - more scientific looking
-    const pinGeometry = new THREE.CylinderGeometry(0.02, 0.06, 0.25, 8);
+    // Vintage map pin style
+    const pinGeometry = new THREE.CylinderGeometry(0.018, 0.055, 0.24, 8);
     const pinMaterial = new THREE.MeshPhongMaterial({
-        color: 0x2196F3,
-        emissive: 0x2196F3,
-        emissiveIntensity: 0.3,
-        shininess: 80
+        color: 0x8b7355,  // Sepia
+        emissive: 0x6b5244,
+        emissiveIntensity: 0.15,
+        shininess: 40
     });
     const pin = new THREE.Mesh(pinGeometry, pinMaterial);
     pin.rotation.x = Math.PI;
 
-    // Marker sphere on top
+    // Vintage brass-like sphere on top
     const sphereGeometry = new THREE.SphereGeometry(0.06, 16, 16);
     const sphereMaterial = new THREE.MeshPhongMaterial({
-        color: 0x4CAF50,
-        emissive: 0x4CAF50,
-        emissiveIntensity: 0.4,
-        shininess: 100
+        color: 0xc9a961,  // Compass gold
+        emissive: 0xc9a961,
+        emissiveIntensity: 0.3,
+        shininess: 70,
+        metalness: 0.5
     });
     const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
     sphere.position.y = 0.15;
 
-    // Subtle ring
+    // Vintage compass-style ring
     const ringGeometry = new THREE.RingGeometry(0.08, 0.09, 32);
     const ringMaterial = new THREE.MeshBasicMaterial({
-        color: 0x2196F3,
+        color: 0xc9b18f,  // Sepia light
         transparent: true,
         opacity: 0.4,
         side: THREE.DoubleSide
@@ -935,9 +941,9 @@ function updateLoadingProgress(percent, text) {
 function animate() {
     requestAnimationFrame(animate);
 
-    // Auto-rotate globe when not animating
+    // Very slow auto-rotate globe when not animating
     if (!isDragging && !isAnimating) {
-        globe.rotation.y += 0.001;
+        globe.rotation.y += 0.0003; // Much slower rotation (0.001 -> 0.0003)
         rotationVelocity.x *= 0.95;
         rotationVelocity.y *= 0.95;
     }
