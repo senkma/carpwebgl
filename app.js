@@ -1220,6 +1220,19 @@ function updateTabContent(skipAnimation = false) {
 // Reset view
 function resetView() {
     console.log('Reset view called');
+
+    // Close info panel
+    const panel = document.getElementById('info-panel');
+    if (panel) {
+        panel.classList.add('hidden');
+    }
+
+    // Hide connection line
+    currentMarker = null;
+    currentLocationData = null;
+    currentTab = 'overview';
+    updateConnectionLine();
+
     // Return to default Antarctica view
     targetPosition = {
         y: 0,  // No longitude rotation
@@ -1228,15 +1241,13 @@ function resetView() {
     targetZoom = 10;  // Original zoom level
     animationProgress = 0;
     isAnimating = true;
+
     // Re-enable auto-rotate when returning to default view
     autoRotateEnabled = true;
-    document.getElementById('info-panel').classList.add('hidden');
 
-    // Hide connection line
-    currentMarker = null;
-    currentLocationData = null;
-    currentTab = 'overview';
-    updateConnectionLine();
+    // Clear rotation velocity
+    rotationVelocity.x = 0;
+    rotationVelocity.y = 0;
 }
 
 // Update loading progress
@@ -1342,5 +1353,66 @@ function easeInOutCubic(t) {
     return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
 
+// Map control functions
+function zoomIn() {
+    targetZoom = Math.max(3, camera.position.z - 0.5);
+    animateZoom();
+}
+
+function zoomOut() {
+    targetZoom = Math.min(15, camera.position.z + 0.5);
+    animateZoom();
+}
+
+// Smooth zoom animation
+function animateZoom() {
+    const diff = targetZoom - camera.position.z;
+    if (Math.abs(diff) > 0.01) {
+        camera.position.z += diff * 0.1;
+        requestAnimationFrame(animateZoom);
+    } else {
+        camera.position.z = targetZoom;
+    }
+}
+
+// Setup map controls
+function setupMapControls() {
+    console.log('Setting up map controls...');
+    const zoomInBtn = document.getElementById('zoom-in');
+    const zoomOutBtn = document.getElementById('zoom-out');
+    const resetBtn = document.getElementById('reset-view');
+
+    console.log('Zoom In button:', zoomInBtn);
+    console.log('Zoom Out button:', zoomOutBtn);
+    console.log('Reset button:', resetBtn);
+
+    if (zoomInBtn) {
+        zoomInBtn.addEventListener('click', () => {
+            console.log('Zoom in clicked');
+            zoomIn();
+        });
+    }
+
+    if (zoomOutBtn) {
+        zoomOutBtn.addEventListener('click', () => {
+            console.log('Zoom out clicked');
+            zoomOut();
+        });
+    }
+
+    if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+            console.log('Reset clicked');
+            resetView();
+        });
+    }
+}
+
 // Start the application
-window.addEventListener('load', init);
+window.addEventListener('load', () => {
+    init();
+    // Wait a bit to ensure DOM is ready
+    setTimeout(() => {
+        setupMapControls();
+    }, 100);
+});
