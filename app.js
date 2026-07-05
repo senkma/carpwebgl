@@ -1354,25 +1354,39 @@ function easeInOutCubic(t) {
 }
 
 // Map control functions
+let zoomAnimationId = null;
+
 function zoomIn() {
-    targetZoom = Math.max(3, camera.position.z - 0.5);
-    animateZoom();
+    const newTarget = Math.max(3, camera.position.z - 2);
+    smoothZoom(newTarget);
 }
 
 function zoomOut() {
-    targetZoom = Math.min(15, camera.position.z + 0.5);
-    animateZoom();
+    const newTarget = Math.min(15, camera.position.z + 2);
+    smoothZoom(newTarget);
 }
 
 // Smooth zoom animation
-function animateZoom() {
-    const diff = targetZoom - camera.position.z;
-    if (Math.abs(diff) > 0.01) {
-        camera.position.z += diff * 0.1;
-        requestAnimationFrame(animateZoom);
-    } else {
-        camera.position.z = targetZoom;
+function smoothZoom(target) {
+    // Cancel previous animation if running
+    if (zoomAnimationId) {
+        cancelAnimationFrame(zoomAnimationId);
     }
+
+    targetZoom = target;
+
+    function animate() {
+        const diff = targetZoom - camera.position.z;
+        if (Math.abs(diff) > 0.01) {
+            camera.position.z += diff * 0.15;
+            zoomAnimationId = requestAnimationFrame(animate);
+        } else {
+            camera.position.z = targetZoom;
+            zoomAnimationId = null;
+        }
+    }
+
+    animate();
 }
 
 // Setup map controls
