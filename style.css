@@ -462,8 +462,8 @@ body::after {
     left: 40px;
     top: 50%;
     transform: translateY(-50%);
-    width: 520px;
-    height: 750px;
+    width: 450px;
+    height: 800px;
     background: rgba(255, 255, 255, 0.97);
     border: none;
     border-radius: 20px;
@@ -619,7 +619,7 @@ body::after {
 
 .info-content h2 {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     font-weight: 600;
     color: #1a1a1a;
     margin-bottom: 8px;
@@ -631,10 +631,10 @@ body::after {
 }
 
 .info-content h3 {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: #c9a961;
-    margin-top: 24px;
-    margin-bottom: 12px;
+    margin-top: 20px;
+    margin-bottom: 10px;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
     font-weight: 600;
     font-style: normal;
@@ -645,12 +645,12 @@ body::after {
 }
 
 .info-content p {
-    line-height: 1.7;
-    margin-bottom: 16px;
+    line-height: 1.6;
+    margin-bottom: 14px;
     color: #333;
     opacity: 1;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     text-align: left;
     font-weight: 400;
 }
@@ -663,13 +663,13 @@ body::after {
 }
 
 .info-content li {
-    margin-bottom: 10px;
+    margin-bottom: 6px;
     color: #444;
     opacity: 1;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-    line-height: 1.7;
-    font-size: 0.9rem;
-    padding-left: 24px;
+    line-height: 1.5;
+    font-size: 0.82rem;
+    padding-left: 20px;
     position: relative;
 }
 
@@ -851,12 +851,52 @@ body::after {
 
 /* Wide panel for info cards */
 .info-panel.wide {
-    width: 800px;
+    width: 700px;
 }
 
 /* Adjust tab arrow positions for wide panel */
 .info-panel.wide .tab-nav-arrow {
     right: -115px;
+}
+
+/* Partner logos grid */
+.partner-logos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+    align-items: center;
+    justify-items: center;
+}
+
+.partner-logos a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    width: 100%;
+    height: 120px;
+}
+
+.partner-logos a:hover {
+    background: rgba(255, 255, 255, 0.8);
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.partner-logos img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    filter: grayscale(20%);
+    transition: filter 0.3s ease;
+}
+
+.partner-logos a:hover img {
+    filter: grayscale(0%);
 }
 
 /* Contact grid styling */

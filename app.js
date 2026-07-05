@@ -1758,46 +1758,34 @@ const cardData = {
     collaboration: {
         title: 'Collaboration & Support',
         image: 'assets/colaboration.jpg',
-        tabs: ['Research Support', 'Public Engagement', 'Private Sector'],
+        tabs: ['Czech Partners', 'International Partners'],
         content: {
-            'Research Support': `
-                <h2>Research Collaboration</h2>
-                <p>CARP welcomes collaboration with national and international research institutions in various fields of Antarctic science.</p>
-                <h3>Collaboration Opportunities</h3>
-                <ul>
-                    <li>Joint research projects and expeditions</li>
-                    <li>Access to station facilities and equipment</li>
-                    <li>Data sharing and long-term monitoring programmes</li>
-                    <li>Student and researcher exchanges</li>
-                    <li>Laboratory analysis and technical support</li>
-                </ul>
-                <h3>International Partners</h3>
-                <p>CARP actively collaborates with leading universities and research institutions worldwide, including Charles University, University of Bergen, SLF Davos, McMurdo LTER, Instituto Antártico Argentino, British Antarctic Survey, and many others.</p>
+            'Czech Partners': `
+                <h2>Czech Research Institutions</h2>
+                <div class="partner-logos">
+                    <a href="https://cuni.cz/UKEN-1.html" target="_blank"><img src="assets/support/uk.png" alt="Charles University"></a>
+                    <a href="https://www.vut.cz/en/" target="_blank"><img src="assets/support/vut.png" alt="Brno University of Technology"></a>
+                    <a href="https://mendelu.cz/en/" target="_blank"><img src="assets/support/mendelu.jpg" alt="Mendel University"></a>
+                    <a href="https://www.jcu.cz/en/" target="_blank"><img src="assets/support/jcu.png" alt="University of South Bohemia"></a>
+                    <a href="https://www.osu.eu/" target="_blank"><img src="assets/support/osu.png" alt="University of Ostrava"></a>
+                    <a href="https://www.cvut.cz/en" target="_blank"><img src="assets/support/cvut.jpg" alt="Czech Technical University"></a>
+                    <a href="https://www.sci.muni.cz/en" target="_blank"><img src="assets/support/prf.png" alt="Faculty of Science MU"></a>
+                    <a href="https://www.ctt.muni.cz/en" target="_blank"><img src="assets/support/ctt.png" alt="CEITEC MU"></a>
+                    <a href="https://www.recetox.muni.cz/en" target="_blank"><img src="assets/support/recetox.png" alt="RECETOX"></a>
+                    <a href="https://www.ceitec.eu/ceitec-but" target="_blank"><img src="assets/support/ceitec.png" alt="CEITEC BUT"></a>
+                    <a href="https://www.avcr.cz/en/" target="_blank"><img src="assets/support/cas.png" alt="Czech Academy of Sciences"></a>
+                </div>
             `,
-            'Public Engagement': `
-                <h2>Public Engagement & Education</h2>
-                <p>CARP is committed to sharing Antarctic science with the broader public and inspiring the next generation of polar researchers.</p>
-                <h3>Educational Activities</h3>
-                <ul>
-                    <li>University courses and field training</li>
-                    <li>Public lectures and presentations</li>
-                    <li>School visits and educational programmes</li>
-                    <li>Media engagement and science communication</li>
-                    <li>Open access to research data and publications</li>
-                </ul>
-            `,
-            'Private Sector': `
-                <h2>Private Sector Collaboration</h2>
-                <p>CARP offers opportunities for private sector involvement in Antarctic research and technology development.</p>
-                <h3>Collaboration Areas</h3>
-                <ul>
-                    <li>Equipment testing in extreme conditions ("Tested in Antarctica")</li>
-                    <li>Material science and cold-weather performance</li>
-                    <li>Technology development and innovation</li>
-                    <li>Sponsorship and corporate partnerships</li>
-                    <li>Antarctic expeditions support</li>
-                </ul>
-                <p>Testing products in Antarctica provides unique validation under the harshest conditions on Earth.</p>
+            'International Partners': `
+                <h2>International Collaboration</h2>
+                <div class="partner-logos">
+                    <a href="http://uac.gov.ua/en/" target="_blank"><img src="assets/support/ukraine.png" alt="National Antarctic Scientific Center of Ukraine"></a>
+                    <a href="https://www.inach.cl/" target="_blank"><img src="assets/support/inach.png" alt="INACH Chile"></a>
+                    <a href="https://www.propolar.org/" target="_blank"><img src="assets/support/propolar.png" alt="ProPolar"></a>
+                    <a href="https://www.marinha.mil.br/secirm/proantar" target="_blank"><img src="assets/support/proantar.png" alt="PROANTAR Brazil"></a>
+                    <a href="https://www.cancilleria.gob.ar/es/iniciativas/dna/instituto-antartico-argentino" target="_blank"><img src="assets/support/iaa.png" alt="Instituto Antártico Argentino"></a>
+                    <a href="https://www.bas.ac.uk/" target="_blank"><img src="assets/support/bas.png" alt="British Antarctic Survey"></a>
+                </div>
             `
         }
     },
