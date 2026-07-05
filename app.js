@@ -1841,78 +1841,142 @@ const cardData = {
         tabs: ['Team Contacts'],
         content: {
             'Team Contacts': `
-                <h2>Contact Information</h2>
+                <h2>CARP Team</h2>
                 <p><strong>Czech Antarctic Research Programme</strong><br>
                 Masaryk University, Faculty of Science<br>
-                Kotlářská 2<br>
-                611 37 BRNO, Czech Republic, Europe</p>
+                Kotlářská 2, 611 37 BRNO, Czech Republic</p>
 
-                <div class="contact-grid">
-                    <div class="contact-person">
-                        <h4>Assoc. Prof. Daniel Nývlt, Ph.D.</h4>
-                        <div class="role">CARP Head - Geomorphologist</div>
-                        <div class="details">
-                            Tel: +420 549 49 58 46<br>
-                            Email: daniel.nyvlt@sci.muni.cz
+                <div class="team-grid">
+                    <div class="team-member" data-person="laska">
+                        <div class="member-photo">
+                            <img src="assets/team/laska.jpg" alt="Kamil Láska">
                         </div>
+                        <h4>Kamil Láska</h4>
+                        <div class="role">Atmospheric Sciences</div>
                     </div>
 
-                    <div class="contact-person">
-                        <h4>Pavel Kapler, Ph.D.</h4>
-                        <div class="role">CARP Manager - Chief of Operations</div>
-                        <div class="details">
-                            WhatsApp: +420 773 79 88 04<br>
-                            Email: kapler@sci.muni.cz
+                    <div class="team-member" data-person="roman">
+                        <div class="member-photo">
+                            <img src="assets/team/roman.jpg" alt="Matěj Roman">
                         </div>
+                        <h4>Matěj Roman</h4>
+                        <div class="role">Geo-Sciences</div>
                     </div>
 
-                    <div class="contact-person">
-                        <h4>Assoc. Prof. Kamil Láska, Ph.D.</h4>
-                        <div class="role">Atmospheric Sciences Head - Climatologist</div>
-                        <div class="details">
-                            Tel: +420 549 49 5750<br>
-                            Email: laska@sci.muni.cz
+                    <div class="team-member" data-person="bartak">
+                        <div class="member-photo">
+                            <img src="assets/team/bartak.jpg" alt="Miloš Barták">
                         </div>
+                        <h4>Miloš Barták</h4>
+                        <div class="role">Plants & Ecology</div>
                     </div>
 
-                    <div class="contact-person">
-                        <h4>Matěj Roman, Ph.D.</h4>
-                        <div class="role">Geo-Sciences Head - Periglacial Geomorphologist</div>
-                        <div class="details">
-                            Tel: +420 704 343 653<br>
-                            Email: matej.roman@gmail.com
+                    <div class="team-member" data-person="svec">
+                        <div class="member-photo">
+                            <img src="assets/team/svec.jpg" alt="Pavel Švec">
                         </div>
+                        <h4>Pavel Švec</h4>
+                        <div class="role">Microbiology</div>
                     </div>
 
-                    <div class="contact-person">
-                        <h4>Professor Miloš Barták</h4>
-                        <div class="role">Plants & Ecology Head - Plant Physiologist</div>
-                        <div class="details">
-                            Tel: +420 549 49 3087<br>
-                            Email: mbartak@sci.muni.cz
+                    <div class="team-member" data-person="kohler">
+                        <div class="member-photo">
+                            <img src="assets/team/kohler.jpg" alt="Tyler Joe Kohler">
                         </div>
+                        <h4>Tyler Joe Kohler</h4>
+                        <div class="role">LTEM</div>
+                    </div>
+                </div>
+            `
+        },
+        secondaryContent: {
+            'Team Contacts': `
+                <div class="team-grid">
+                    <div class="team-member" data-person="nyvlt">
+                        <div class="member-photo">
+                            <img src="assets/team/nyvlt.jpg" alt="Daniel Nývlt">
+                        </div>
+                        <h4>Daniel Nývlt</h4>
+                        <div class="role">CARP Head</div>
                     </div>
 
-                    <div class="contact-person">
-                        <h4>Assoc. Prof. Pavel Švec, Ph.D.</h4>
-                        <div class="role">Microbiology Head - Microbiologist</div>
-                        <div class="details">
-                            Tel: +420 549 49 7601<br>
-                            Email: pavel@sci.muni.cz
+                    <div class="team-member" data-person="kapler">
+                        <div class="member-photo">
+                            <img src="assets/team/kapler.jpg" alt="Pavel Kapler">
                         </div>
-                    </div>
-
-                    <div class="contact-person">
-                        <h4>Tyler Joe Kohler, Ph.D.</h4>
-                        <div class="role">LTEM Head - Ecologist</div>
-                        <div class="details">
-                            Tel: +420 221 951 073<br>
-                            Email: kohlert@natur.cuni.cz
-                        </div>
+                        <h4>Pavel Kapler</h4>
+                        <div class="role">CARP Manager</div>
                     </div>
                 </div>
             `
         }
+    }
+};
+
+// Team member detailed information
+const teamMemberData = {
+    nyvlt: {
+        name: 'Assoc. Prof. Daniel Nývlt, Ph.D.',
+        role: 'CARP Head',
+        specialization: 'Geomorphologist',
+        photo: 'assets/team/nyvlt.jpg',
+        phone: '+420 549 49 58 46',
+        email: 'daniel.nyvlt@sci.muni.cz',
+        bio: 'Daniel Nývlt leads the Department of Geography\'s Polar-Geo-Lab scientific group at Masaryk University\'s Faculty of Science. For the past twenty years, he has been undertaking intensive research in the Antarctic and Arctic regions.'
+    },
+    kapler: {
+        name: 'Pavel Kapler, Ph.D.',
+        role: 'CARP Manager',
+        specialization: 'Chief of Operations',
+        photo: 'assets/team/kapler.jpg',
+        phone: '+420 773 79 88 04',
+        email: 'kapler@sci.muni.cz',
+        bio: 'Pavel Kapler is the Manager of the Czech Antarctic Research Programme since 2010. He was involved in all milestones CARP has undergone since the construction of the J.G. Mendel Station, including gaining membership in COMNAP and SCAR.'
+    },
+    laska: {
+        name: 'Assoc. Prof. Kamil Láska, Ph.D.',
+        role: 'Atmospheric Sciences Head',
+        specialization: 'Climatologist',
+        photo: 'assets/team/laska.jpg',
+        phone: '+420 549 49 5750',
+        email: 'laska@sci.muni.cz',
+        bio: 'Kamil Láska is a leading expert in Antarctic atmospheric sciences and climatology, conducting long-term meteorological observations at the J.G. Mendel Station.'
+    },
+    roman: {
+        name: 'Matěj Roman, Ph.D.',
+        role: 'Geo-Sciences Head',
+        specialization: 'Periglacial Geomorphologist',
+        photo: 'assets/team/roman.jpg',
+        phone: '+420 704 343 653',
+        email: 'matej.roman@gmail.com',
+        bio: 'Matěj Roman specializes in periglacial geomorphology, studying the formation and evolution of landforms in cold regions, with extensive fieldwork experience in Antarctica and the Arctic.'
+    },
+    bartak: {
+        name: 'Professor Miloš Barták',
+        role: 'Plants & Ecology Head',
+        specialization: 'Plant Physiologist',
+        photo: 'assets/team/bartak.jpg',
+        phone: '+420 549 49 3087',
+        email: 'mbartak@sci.muni.cz',
+        bio: 'Miloš Barták is a renowned plant physiologist studying the adaptation of polar vegetation to extreme Antarctic conditions, with focus on photosynthesis and stress tolerance.'
+    },
+    svec: {
+        name: 'Assoc. Prof. Pavel Švec, Ph.D.',
+        role: 'Microbiology Head',
+        specialization: 'Microbiologist',
+        photo: 'assets/team/svec.jpg',
+        phone: '+420 549 49 7601',
+        email: 'pavel@sci.muni.cz',
+        bio: 'Pavel Švec leads microbiology research in Antarctica, focusing on cold-adapted bacteria and archaea, with extensive work on biodiversity and taxonomy of polar microorganisms.'
+    },
+    kohler: {
+        name: 'Tyler Joe Kohler, Ph.D.',
+        role: 'LTEM Head',
+        specialization: 'Ecologist',
+        photo: 'assets/team/kohler.jpg',
+        phone: '+420 221 951 073',
+        email: 'kohlert@natur.cuni.cz',
+        bio: 'Tyler Kohler leads the Long-Term Ecological Monitoring program, studying Antarctic aquatic ecosystems, microbial mats, and biogeochemical processes in glacial streams and lakes.'
     }
 };
 
@@ -2070,6 +2134,9 @@ function updateInfoCardTabContent() {
             if (contentWrapper) {
                 contentWrapper.innerHTML = html;
                 contentWrapper.style.opacity = '1';
+
+                // Add click handlers to team members
+                setupTeamMemberClicks();
             }
         }, 200);
     } else {
@@ -2084,6 +2151,65 @@ function updateInfoCardTabContent() {
             content.style.opacity = '1';
         }, 200);
     }
+}
+
+// Setup team member click handlers
+function setupTeamMemberClicks() {
+    const teamMembers = document.querySelectorAll('.team-member');
+
+    teamMembers.forEach(member => {
+        member.addEventListener('click', () => {
+            const personId = member.getAttribute('data-person');
+            const personData = teamMemberData[personId];
+
+            if (personData) {
+                showPersonalCard(personData);
+            }
+        });
+    });
+}
+
+// Show personal card for a team member
+function showPersonalCard(person) {
+    const infoPanel = document.getElementById('info-panel');
+    const contentWrapper = infoPanel.querySelector('.info-content-wrapper');
+
+    if (!contentWrapper) return;
+
+    // Fade out
+    contentWrapper.style.opacity = '0.3';
+
+    setTimeout(() => {
+        const html = `
+            <div class="personal-card">
+                <div class="personal-card-header">
+                    <div class="personal-photo">
+                        <img src="${person.photo}" alt="${person.name}">
+                    </div>
+                    <div class="personal-info">
+                        <h2>${person.name}</h2>
+                        <h3>${person.role}</h3>
+                        <p class="specialization">${person.specialization}</p>
+                    </div>
+                </div>
+                <div class="personal-card-content">
+                    <div class="contact-details">
+                        <h4>Contact Information</h4>
+                        <p><strong>Phone:</strong> ${person.phone}</p>
+                        <p><strong>Email:</strong> <a href="mailto:${person.email}">${person.email}</a></p>
+                    </div>
+                    <div class="bio">
+                        <h4>Biography</h4>
+                        <p>${person.bio}</p>
+                    </div>
+                    <button class="back-button" onclick="updateInfoCardTabContent()">← Back to Team</button>
+                </div>
+            </div>
+        `;
+
+        contentWrapper.innerHTML = html;
+        contentWrapper.style.opacity = '1';
+    }, 200);
 }
 
 // Start the application
