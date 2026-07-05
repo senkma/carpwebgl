@@ -729,21 +729,22 @@ function setupEventListeners() {
     // Mouse wheel for zoom
     window.addEventListener('wheel', onMouseWheel, { passive: false });
 
-    // Location cards
-    document.querySelectorAll('.location-card').forEach(card => {
-        card.addEventListener('click', () => {
-            const locationKey = card.getAttribute('data-location');
-            flyToLocation(locationKey);
-        });
-    });
-
-    // Station cards
+    // Station cards (bottom)
     document.querySelectorAll('.station-card').forEach(card => {
         card.addEventListener('click', () => {
             const locationKey = card.getAttribute('data-location');
             flyToLocation(locationKey);
         });
     });
+
+    // University card (right)
+    const universityCard = document.querySelector('.university-card');
+    if (universityCard) {
+        universityCard.addEventListener('click', () => {
+            const locationKey = universityCard.getAttribute('data-location');
+            flyToLocation(locationKey);
+        });
+    }
 
     // Close info panel
     document.getElementById('close-panel').addEventListener('click', () => {
