@@ -1574,6 +1574,17 @@ function setupLanguageSwitcher() {
     });
 }
 
+// Setup logo reset
+function setupLogoReset() {
+    const logoLink = document.getElementById('logo-reset');
+    if (logoLink) {
+        logoLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            resetView();
+        });
+    }
+}
+
 // Start the application
 window.addEventListener('load', () => {
     init();
@@ -1581,5 +1592,6 @@ window.addEventListener('load', () => {
     setTimeout(() => {
         setupMapControls();
         setupLanguageSwitcher();
+        setupLogoReset();
     }, 100);
 });
