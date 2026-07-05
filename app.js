@@ -220,11 +220,11 @@ function createGlobe() {
             // Base texture
             vec4 texColor = texture2D(globeTexture, vUv);
 
-            // Realistic lighting
+            // Realistic lighting - světlejší verze
             vec3 lightDir = normalize(lightPosition - vPosition);
             float diff = max(dot(vNormal, lightDir), 0.0);
-            float ambient = 0.4;
-            float lighting = ambient + diff * 0.6;
+            float ambient = 0.55;  // Zvýšeno z 0.4 na 0.55
+            float lighting = ambient + diff * 0.7;  // Zvýšeno z 0.6 na 0.7
 
             gl_FragColor = vec4(texColor.rgb * lighting, 1.0);
         }
@@ -698,8 +698,8 @@ function createLights() {
     sunLight.position.set(5, 3, 5);
     scene.add(sunLight);
 
-    // Ambient light
-    const ambientLight = new THREE.AmbientLight(0x404040, 0.8);
+    // Ambient light - světlejší
+    const ambientLight = new THREE.AmbientLight(0x606060, 1.0);  // Světlejší barva a vyšší intenzita
     scene.add(ambientLight);
 
     // Accent lights

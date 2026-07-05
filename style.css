@@ -27,11 +27,16 @@
 body {
     font-family: 'Georgia', 'Times New Roman', serif;
     overflow: hidden;
-    background: var(--old-paper);
+    background-image: url('assets/wooden-floor-background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     color: var(--text-vintage);
     position: relative;
 }
 
+/* Subtle overlay over wooden background for better readability */
 body::before {
     content: '';
     position: fixed;
@@ -39,46 +44,16 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 0;
-    opacity: 0.12;
-    background-image:
-        /* Antarctica main ice sheet - circular */
-        radial-gradient(circle 900px at 50% 55%, transparent 42%, var(--sepia-dark) 42.2%, var(--sepia-dark) 43%, transparent 43.2%),
-        /* Ross Ice Shelf (bottom right) */
-        radial-gradient(circle 250px at 62% 70%, transparent 45%, var(--sepia-medium) 45.5%, transparent 46%),
-        /* Ronne Ice Shelf (bottom left) */
-        radial-gradient(circle 280px at 38% 68%, transparent 45%, var(--sepia-medium) 45.5%, transparent 46%),
-        /* Antarctic Peninsula (pointing up-left) */
-        radial-gradient(ellipse 180px 350px at 35% 45%, transparent 48%, var(--sepia-dark) 48.5%, var(--sepia-dark) 49.5%, transparent 50%),
-        /* Transantarctic Mountains (line across) */
-        linear-gradient(125deg, transparent 49.3%, var(--sepia-light) 49.5%, var(--sepia-light) 50%, transparent 50.2%),
-        /* Latitude circles (parallels) */
-        radial-gradient(circle 600px at 50% 55%, transparent 49%, var(--sepia-light) 49.3%, transparent 49.6%),
-        radial-gradient(circle 800px at 50% 55%, transparent 49%, var(--sepia-light) 49.3%, transparent 49.6%),
-        radial-gradient(circle 1000px at 50% 55%, transparent 49%, var(--sepia-light) 49.3%, transparent 49.6%),
-        /* Meridian lines (longitude) */
-        repeating-conic-gradient(from 0deg at 50% 55%, transparent 0deg, transparent 14.9deg, var(--sepia-light) 15deg, transparent 15.1deg, transparent 29.9deg);
-    background-position: center center;
-    background-repeat: no-repeat;
+    background: linear-gradient(
+        to bottom,
+        rgba(244, 232, 208, 0.15),
+        rgba(224, 211, 181, 0.2)
+    );
+    pointer-events: none;
+    z-index: 1;
 }
 
-/* Add decorative compass rose */
-body::before {
-    content: '✤ ANTARCTICA ✤';
-    position: fixed;
-    top: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-family: 'Georgia', serif;
-    font-size: 0.9rem;
-    font-weight: 700;
-    letter-spacing: 6px;
-    color: var(--sepia-dark);
-    opacity: 0.25;
-    z-index: 0;
-    text-align: center;
-}
-
+/* Subtle vignette effect */
 body::after {
     content: '';
     position: fixed;
@@ -88,15 +63,9 @@ body::after {
     height: 100%;
     z-index: 1;
     pointer-events: none;
-    /* Paper texture overlay */
-    background-image:
-        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(139, 115, 85, 0.02) 2px, rgba(139, 115, 85, 0.02) 4px),
-        repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(107, 82, 68, 0.015) 2px, rgba(107, 82, 68, 0.015) 4px);
-    /* Age spots */
-    background-color: transparent;
     box-shadow:
-        inset 0 0 200px rgba(139, 115, 85, 0.1),
-        inset 0 0 100px rgba(92, 74, 58, 0.05);
+        inset 0 0 200px rgba(45, 36, 22, 0.2),
+        inset 0 0 100px rgba(92, 74, 58, 0.1);
 }
 
 /* Loading Screen */
