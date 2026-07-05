@@ -872,18 +872,19 @@ function flyToLocation(locationKey) {
     const lat = location.coords.lat;
     const lon = location.coords.lon;
 
-    // Simple direct mapping:
-    // rotation.y = -longitude (to face the location)
-    // rotation.x = tilt from equator
-    // Globe starts with south pole up (x = -PI/2)
-    // For south pole: x = -PI/2, for north pole: x = PI/2, for equator: x = 0
+    // Match the marker positioning logic from createMarker()
+    // Markers use: theta = (lon + 180) * PI/180
+    // So we need to rotate the globe to bring that theta to face the camera
 
     const latRad = lat * Math.PI / 180;
     const lonRad = lon * Math.PI / 180;
 
+    // Globe rotation to center the location
+    // Globe starts at: rotation.x = -PI/2 (south pole up), rotation.y = 0
+    // Add PI/2 offset to Y rotation to correct texture alignment
     targetPosition = {
-        y: -lonRad,  // Rotate to longitude
-        x: latRad    // Direct latitude angle (south pole = -PI/2, north pole = +PI/2)
+        y: -(lonRad + Math.PI) + Math.PI / 2,  // Add 90° offset for texture
+        x: latRad                               // Direct latitude mapping
     };
 
     console.log(`Flying to ${locationKey}: lat=${lat}, lon=${lon}`);
@@ -1022,7 +1023,12 @@ function animate() {
             rotationVelocity.y = 0;
             isAnimating = false;
             animationProgress = 0;
+
+            // Calculate what GPS coordinates we're actually showing
+            const actualLat = globe.rotation.x * 180 / Math.PI;
+            const actualLon = -(globe.rotation.y + Math.PI) * 180 / Math.PI;
             console.log('Animation complete. Final rotation:', globe.rotation.x, globe.rotation.y);
+            console.log('Showing GPS: lat=' + actualLat.toFixed(2) + ', lon=' + actualLon.toFixed(2));
         }
     }
 
