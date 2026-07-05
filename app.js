@@ -1593,6 +1593,7 @@ function setupLogoReset() {
 const cardData = {
     programme: {
         title: 'Czech Antarctic Research Programme',
+        image: 'assets/programme.jpg',
         tabs: ['About Us', 'History', 'Structure'],
         content: {
             'About Us': `
@@ -1639,6 +1640,7 @@ const cardData = {
     },
     research: {
         title: 'Research',
+        image: 'assets/research.jpg',
         tabs: ['Overview', 'Atmospheric Sciences', 'Geo-Sciences', 'Biology', 'Microbiology'],
         content: {
             'Overview': `
@@ -1719,6 +1721,7 @@ const cardData = {
     },
     publications: {
         title: 'Publications',
+        image: 'assets/publication.jpg',
         tabs: ['Czech Polar Reports', 'Recent Years'],
         content: {
             'Czech Polar Reports': `
@@ -1754,6 +1757,7 @@ const cardData = {
     },
     collaboration: {
         title: 'Collaboration & Support',
+        image: 'assets/colaboration.jpg',
         tabs: ['Research Support', 'Public Engagement', 'Private Sector'],
         content: {
             'Research Support': `
@@ -1799,6 +1803,7 @@ const cardData = {
     },
     contact: {
         title: 'Contact',
+        image: 'assets/contact.jpeg',
         tabs: ['Team Contacts'],
         content: {
             'Team Contacts': `
@@ -1999,7 +2004,14 @@ function updateInfoCardTabContent() {
     content.style.opacity = '0.3';
 
     setTimeout(() => {
-        content.innerHTML = currentInfoCardData.content[tabName];
+        // Add image at the top like station cards
+        let html = '';
+        if (currentInfoCardData.image) {
+            html += `<img src="${currentInfoCardData.image}" alt="${currentInfoCardData.title}" class="tab-image">`;
+        }
+        html += currentInfoCardData.content[tabName];
+
+        content.innerHTML = html;
         content.style.opacity = '1';
     }, 200);
 }
