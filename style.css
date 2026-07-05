@@ -19,7 +19,7 @@
     --land-vintage: #a89968;
     --dark-bg: #1a1410;
     --paper-overlay: rgba(244, 232, 208, 0.92);
-    --glass-vintage: rgba(92, 74, 58, 0.85);
+    --glass-vintage: rgba(92, 74, 58, 0.4);
     --text-vintage: #3d3020;
     --border-vintage: rgba(139, 115, 85, 0.6);
 }
@@ -200,7 +200,7 @@ body::after {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: linear-gradient(180deg, var(--glass-vintage) 0%, transparent 100%);
+    background: linear-gradient(180deg, var(--glass-vintage) 0%, transparent 25%);
     backdrop-filter: blur(8px);
     border-bottom: 3px double var(--compass-gold);
     box-shadow: 0 2px 0 var(--sepia-dark);
@@ -553,7 +553,7 @@ body::after {
     right: 0;
     padding: 22px 50px;
     text-align: center;
-    background: linear-gradient(0deg, var(--glass-vintage) 0%, transparent 100%);
+    background: linear-gradient(0deg, var(--glass-vintage) 0%, transparent 25%);
     backdrop-filter: blur(8px);
     border-top: 3px double var(--compass-gold);
     box-shadow: 0 -2px 0 var(--sepia-dark);
