@@ -747,6 +747,8 @@ function setupEventListeners() {
         document.getElementById('info-panel').classList.add('hidden');
         // Hide connection line
         currentMarker = null;
+        currentLocationData = null;
+        currentTab = 'overview';
         updateConnectionLine();
     });
 
@@ -939,54 +941,103 @@ function updateConnectionLine() {
     pathElement.setAttribute('opacity', '1');
 }
 
-// Show location information
+// Current active tab and location
+let currentLocationData = null;
+let currentTab = 'overview';
+
+// Show location information with tabs
 function showLocationInfo(location) {
+    currentLocationData = location;
+    currentTab = 'overview';
+
     const panel = document.getElementById('info-panel');
+    const tabsContainer = document.getElementById('info-tabs');
+
+    // Create tabs
+    tabsContainer.innerHTML = `
+        <button class="info-tab active" data-tab="overview">Overview</button>
+        <button class="info-tab" data-tab="research">Research</button>
+        <button class="info-tab" data-tab="facilities">Facilities</button>
+    `;
+
+    // Add click handlers to tabs
+    const tabs = tabsContainer.querySelectorAll('.info-tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            currentTab = tab.dataset.tab;
+            updateTabContent();
+        });
+    });
+
+    updateTabContent();
+    panel.classList.remove('hidden');
+}
+
+// Update tab content based on current tab
+function updateTabContent() {
+    if (!currentLocationData) return;
+
     const content = document.getElementById('info-content');
+    const tabs = document.querySelectorAll('.info-tab');
 
-    let html = `
-        <h2>${location.info.title}</h2>
-        <p style="color: var(--accent-cyan); margin-bottom: 20px;">${location.info.subtitle}</p>
-        <p>${location.info.description}</p>
+    // Update active tab styling
+    tabs.forEach(tab => {
+        if (tab.dataset.tab === currentTab) {
+            tab.classList.add('active');
+        } else {
+            tab.classList.remove('active');
+        }
+    });
 
-        <div class="info-stats">
-    `;
+    let html = '';
 
-    location.info.stats.forEach(stat => {
-        html += `
-            <div class="stat-item">
-                <div class="stat-label">${stat.label}</div>
-                <div class="stat-value">${stat.value}</div>
-            </div>
+    if (currentTab === 'overview') {
+        html = `
+            <h2>${currentLocationData.info.title}</h2>
+            <p style="color: #999; margin-bottom: 20px; font-size: 0.9rem;">${currentLocationData.info.subtitle}</p>
+            <p>${currentLocationData.info.description}</p>
+            <div class="info-stats">
         `;
-    });
 
-    html += `
-        </div>
+        currentLocationData.info.stats.forEach(stat => {
+            html += `
+                <div class="stat-item">
+                    <div class="stat-label">${stat.label}</div>
+                    <div class="stat-value">${stat.value}</div>
+                </div>
+            `;
+        });
 
-        <h3>🔬 Research Activities</h3>
-        <ul>
-    `;
+        html += `</div>`;
 
-    location.info.research.forEach(item => {
-        html += `<li>${item}</li>`;
-    });
+    } else if (currentTab === 'research') {
+        html = `
+            <h2>Research Activities</h2>
+            <p style="color: #999; margin-bottom: 24px;">Scientific programs and ongoing research at ${currentLocationData.info.title}</p>
+            <ul>
+        `;
 
-    html += `
-        </ul>
+        currentLocationData.info.research.forEach(item => {
+            html += `<li>${item}</li>`;
+        });
 
-        <h3>🏗️ Facilities</h3>
-        <ul>
-    `;
+        html += `</ul>`;
 
-    location.info.facilities.forEach(item => {
-        html += `<li>${item}</li>`;
-    });
+    } else if (currentTab === 'facilities') {
+        html = `
+            <h2>Facilities & Infrastructure</h2>
+            <p style="color: #999; margin-bottom: 24px;">Available facilities and infrastructure at ${currentLocationData.info.title}</p>
+            <ul>
+        `;
 
-    html += `</ul>`;
+        currentLocationData.info.facilities.forEach(item => {
+            html += `<li>${item}</li>`;
+        });
+
+        html += `</ul>`;
+    }
 
     content.innerHTML = html;
-    panel.classList.remove('hidden');
 }
 
 // Reset view
@@ -1006,6 +1057,8 @@ function resetView() {
 
     // Hide connection line
     currentMarker = null;
+    currentLocationData = null;
+    currentTab = 'overview';
     updateConnectionLine();
 }
 
