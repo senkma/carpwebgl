@@ -745,6 +745,9 @@ function setupEventListeners() {
     // Close info panel
     document.getElementById('close-panel').addEventListener('click', () => {
         document.getElementById('info-panel').classList.add('hidden');
+        // Hide connection line
+        currentMarker = null;
+        updateConnectionLine();
     });
 
     // Reset view button
@@ -901,8 +904,22 @@ function flyToLocation(locationKey) {
 let currentMarker = null;
 
 function updateConnectionLine() {
+    const pathElement = document.getElementById('connection-path');
+
+    if (!pathElement) {
+        console.error('connection-path element not found!');
+        return;
+    }
+
     if (!currentMarker) {
-        document.getElementById('connection-path').style.opacity = '0';
+        pathElement.setAttribute('opacity', '0');
+        return;
+    }
+
+    // Check if info panel is visible
+    const infoPanel = document.getElementById('info-panel');
+    if (!infoPanel || infoPanel.classList.contains('hidden')) {
+        pathElement.setAttribute('opacity', '0');
         return;
     }
 
@@ -926,9 +943,8 @@ function updateConnectionLine() {
 
     const path = `M ${markerX} ${markerY} Q ${controlX} ${controlY}, ${panelX} ${panelY}`;
 
-    const pathElement = document.getElementById('connection-path');
     pathElement.setAttribute('d', path);
-    pathElement.style.opacity = '1';
+    pathElement.setAttribute('opacity', '1');
 }
 
 // Show location information
@@ -1061,11 +1077,16 @@ function animate() {
             isAnimating = false;
             animationProgress = 0;
 
+            // DON'T reset targetPosition and targetZoom - keep them so the globe stays at this location
+            // targetPosition = null;
+            // targetZoom = null;
+
             // Calculate what GPS coordinates we're actually showing
             const actualLat = globe.rotation.x * 180 / Math.PI;
             const actualLon = -(globe.rotation.y + Math.PI) * 180 / Math.PI;
             console.log('Animation complete. Final rotation:', globe.rotation.x, globe.rotation.y);
             console.log('Showing GPS: lat=' + actualLat.toFixed(2) + ', lon=' + actualLon.toFixed(2));
+            console.log('currentMarker is set:', currentMarker !== null);
         }
     }
 
