@@ -782,6 +782,111 @@ body::after {
     justify-content: space-between;
 }
 
+/* Top Info Cards */
+.top-info-cards {
+    position: fixed;
+    top: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 20px;
+    z-index: 100;
+    pointer-events: none;
+}
+
+.info-card {
+    width: 180px;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    pointer-events: all;
+    border: 2px solid transparent;
+}
+
+.info-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+    border-color: var(--compass-gold);
+}
+
+.info-card .card-image {
+    width: 100%;
+    height: 120px;
+    overflow: hidden;
+    background: #f0f0f0;
+}
+
+.info-card .card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.info-card:hover .card-image img {
+    transform: scale(1.1);
+}
+
+.info-card .card-content {
+    padding: 15px;
+    text-align: center;
+}
+
+.info-card .card-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    font-family: 'Rajdhani', sans-serif;
+}
+
+/* Wide panel for info cards */
+.info-panel.wide {
+    width: 800px;
+}
+
+/* Adjust tab arrow positions for wide panel */
+.info-panel.wide .tab-nav-arrow {
+    right: -115px;
+}
+
+/* Contact grid styling */
+.contact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.contact-person {
+    background: #f8f8f8;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid var(--compass-gold);
+}
+
+.contact-person h4 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.2rem;
+    color: #1a1a1a;
+    margin-bottom: 5px;
+}
+
+.contact-person .role {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.contact-person .details {
+    font-size: 0.95rem;
+    color: #555;
+    line-height: 1.6;
+}
+
 /* Map Controls */
 .map-controls {
     position: fixed;

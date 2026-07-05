@@ -814,10 +814,14 @@ function setupEventListeners() {
 
     // Close info panel
     document.getElementById('close-panel').addEventListener('click', () => {
-        document.getElementById('info-panel').classList.add('hidden');
-        // Hide connection line
+        const infoPanel = document.getElementById('info-panel');
+        infoPanel.classList.add('hidden');
+        infoPanel.classList.remove('wide');
+
+        // Reset states
         currentMarker = null;
         currentLocationData = null;
+        currentInfoCardData = null;
         currentTab = 'overview';
         updateConnectionLine();
     });
@@ -1585,6 +1589,421 @@ function setupLogoReset() {
     }
 }
 
+// Card data structure
+const cardData = {
+    programme: {
+        title: 'Czech Antarctic Research Programme',
+        tabs: ['About Us', 'History', 'Structure'],
+        content: {
+            'About Us': `
+                <h2>About CARP</h2>
+                <p>Masaryk University is the only university in the world that owns and operates a scientific station in Antarctica. The operation includes the J.G. Mendel Czech Antarctic Station on James Ross Island, technical facilities CZ*ECO Nelson on Nelson Island, and auxiliary infrastructure in Brno.</p>
+                <p>Through its internationally recognised Antarctic Research Programme (CARP), Masaryk University ensures that the Czech Republic maintains its consultative membership within the Antarctic Treaty community.</p>
+                <h3>Main Benefits</h3>
+                <ul>
+                    <li>Valuable scientific knowledge and understanding of the Antarctic region</li>
+                    <li>Benefits to national economy and environmental protection</li>
+                    <li>Building international scientific relations and foreign policy</li>
+                    <li>Contributing to national security</li>
+                </ul>
+            `,
+            'History': `
+                <h2>History</h2>
+                <p>The Czech Republic has historically carried out significant scientific research in Antarctica. The plans for setting up a Czech base go back to the 1990s, when legal, logistical, and constructional preparations began.</p>
+                <p>The research station was built by Masaryk University between 2005–2006 in the northern part of James Ross Island. Construction was finished in February 2006, and since then, successful scientific expeditions are undertaken each austral summer.</p>
+                <p>The base bears the name of <strong>Johann Gregor Mendel</strong> (1822–1884), a founder of modern genetics and pioneering meteorologist who lived and worked in Brno.</p>
+                <h3>Key Milestones</h3>
+                <ul>
+                    <li><strong>1962:</strong> Czechoslovakia accedes to the Antarctic Treaty</li>
+                    <li><strong>2006:</strong> J.G. Mendel Station completed</li>
+                    <li><strong>2013:</strong> Membership in COMNAP</li>
+                    <li><strong>2014:</strong> Czech Republic gains consultative status in Antarctic Treaty, membership in SCAR</li>
+                    <li><strong>2019:</strong> Prague hosts ATCM XLII</li>
+                </ul>
+            `,
+            'Structure': `
+                <h2>Programme Structure</h2>
+                <p>The CARP management structure consists of several levels, with the Board of Coordinators forming the main executive body.</p>
+                <h3>Executive Management</h3>
+                <ul>
+                    <li><strong>Principal Investigator</strong> - Head of Executive</li>
+                    <li><strong>Project and Logistic Coordinator</strong> - Station Chief</li>
+                    <li><strong>Scientific Coordinator</strong> - EEL/Polar-Bio-Lab Head</li>
+                    <li><strong>Educational Coordinator</strong> - Polar-Geo-Lab Head</li>
+                    <li><strong>Technical Innovation Coordinator</strong> - Open Access Data Unit Head</li>
+                </ul>
+                <h3>Oversight</h3>
+                <p>The Board of Coordinators is overseen by the Supervisory Board and collaborates with the Scientific Board and External Advisory Board. Support Services include Administration, Technical Staff, Logistics, and Public Relations.</p>
+            `
+        }
+    },
+    research: {
+        title: 'Research',
+        tabs: ['Overview', 'Atmospheric Sciences', 'Geo-Sciences', 'Biology', 'Microbiology'],
+        content: {
+            'Overview': `
+                <h2>Research Programme</h2>
+                <p>The research programme focuses on long-term monitoring and multidisciplinary investigations of one of the largest deglaciated areas in Antarctica.</p>
+                <p>The programme studies both abiotic and biotic components, their relationships, and the functioning of the entire ecosystem, including predictions of future development.</p>
+                <h3>Main Research Areas</h3>
+                <ul>
+                    <li><strong>Earth Sciences:</strong> Geology, geomorphology, palaeontology, geochemistry, climatology, hydrology</li>
+                    <li><strong>Biological Sciences:</strong> Botany, ecology, ecophysiology, plant stress physiology, microbiology, parasitology, soil biology</li>
+                    <li><strong>Technical Sciences:</strong> Advanced polymers, UV-radiation resistance, material testing</li>
+                </ul>
+            `,
+            'Atmospheric Sciences': `
+                <h2>Atmospheric Sciences</h2>
+                <p>Investigation of various aspects of the Antarctic atmosphere from ground to stratosphere, including changes in hydrosphere and cryosphere.</p>
+                <h3>Main Topics</h3>
+                <ul>
+                    <li>Long-term climate monitoring and atmospheric processes</li>
+                    <li>Numerical modelling of boundary layer and extreme weather events</li>
+                    <li>Foehn winds and anomalous temperature events</li>
+                    <li>Solar UV radiation and stratospheric ozone layer</li>
+                    <li>Energy exchange, sediment budget, and soil-vegetation interactions</li>
+                    <li>Glacier mass balance and sensitivity to climate change</li>
+                    <li>Surface water fluxes and glacio-hydrological processes</li>
+                </ul>
+            `,
+            'Geo-Sciences': `
+                <h2>Geo-Sciences</h2>
+                <p>Study of how Antarctic land surface and lithosphere interact with atmosphere, cryosphere, hydrosphere, and biosphere.</p>
+                <h3>Research Focus</h3>
+                <p><strong>Quaternary Palaeoenvironments:</strong></p>
+                <ul>
+                    <li>Deglaciation chronologies and past glacial processes</li>
+                    <li>Palaeolimnology & palaeoecology from sediment records</li>
+                    <li>Physical limnology and lake hydrochemistry</li>
+                    <li>Sediment cascade systems and landscape dynamics</li>
+                </ul>
+                <p><strong>Permafrost Monitoring:</strong></p>
+                <ul>
+                    <li>Active layer dynamics and thermal state modelling</li>
+                    <li>Glacial, paraglacial, and periglacial processes</li>
+                    <li>Soil biogeochemistry in deglaciated terrain</li>
+                </ul>
+            `,
+            'Biology': `
+                <h2>Plants, Ecology & Physiology</h2>
+                <p>Research on stress physiology of Antarctic autotrophs and their survival capabilities in extreme environments.</p>
+                <h3>Main Research Directions</h3>
+                <ul>
+                    <li>Stress physiology and photosynthetic processes</li>
+                    <li>Advanced biophysical methods (chlorophyll fluorescence, spectral reflectance)</li>
+                    <li>Antarctic autotrophs taxonomy and ecology</li>
+                    <li>Low temperature and freezing effects</li>
+                    <li>Cultivation and productivity potential</li>
+                    <li>Radiation biology and UV effects</li>
+                    <li>Biological soil crusts structure and function</li>
+                    <li>Vegetation mapping using drones and spectral analysis</li>
+                </ul>
+                <h3>Long-Term Monitoring</h3>
+                <p>Open-top chambers (OTC) established in 2007 to study vegetation response to global warming. Monitoring includes microclimate, photosynthetic activity, and species composition changes.</p>
+            `,
+            'Microbiology': `
+                <h2>Microbiology</h2>
+                <p>Focus on monitoring, taxonomy, and experimental studies of bacteria and microscopic fungi from diverse Antarctic sources.</p>
+                <h3>Research Topics</h3>
+                <ul>
+                    <li>Biodiversity of psychrotrophic and heterotrophic bacteria</li>
+                    <li>Taxonomy of photosynthetic microorganisms (cyanobacteria, diatoms, microalgae)</li>
+                    <li>Cold-adapted fatty acids, enzymes, and pigments</li>
+                    <li>"Safety Antarctica" - preventing non-native species introduction</li>
+                    <li>Potential pathogens in Antarctic animals</li>
+                    <li>Natural probiotics in marine animal faeces</li>
+                    <li>Diversity and physiology of rock-inhabiting fungi</li>
+                </ul>
+            `
+        }
+    },
+    publications: {
+        title: 'Publications',
+        tabs: ['Czech Polar Reports', 'Recent Years'],
+        content: {
+            'Czech Polar Reports': `
+                <h2>Czech Polar Reports</h2>
+                <p>An international, multidisciplinary, peer-reviewed journal related to polar science, issued twice a year by MUNI Press.</p>
+                <h3>Indexing & Metrics</h3>
+                <ul>
+                    <li><strong>Indexed in:</strong> Web of Science (since 2022), SCOPUS (since 2014)</li>
+                    <li><strong>SCImago Journal Rank (SJR):</strong> 0.185</li>
+                    <li><strong>h-index:</strong> 8</li>
+                    <li><strong>Impact Score (2020):</strong> 0.60</li>
+                    <li><strong>Quartile:</strong> Q3</li>
+                </ul>
+                <p>The journal is dedicated to original research papers for sciences performed in the Arctic, Antarctic, high mountains, and planets with polar analogues.</p>
+                <p>Electronic papers are freely downloadable from the journal webpage.</p>
+            `,
+            'Recent Years': `
+                <h2>Publications by Year</h2>
+                <p>CARP researchers have published extensively in international peer-reviewed journals covering all aspects of Antarctic research.</p>
+                <h3>Publication Years</h3>
+                <ul>
+                    <li>2025 - Current publications</li>
+                    <li>2024 - Recent research</li>
+                    <li>2023 - Published works</li>
+                    <li>2022 - Scientific articles</li>
+                    <li>2021 - Research outputs</li>
+                    <li>2020 - Publications</li>
+                    <li>2010-2019 - Historical publications</li>
+                </ul>
+                <p>For a complete list of publications, please visit the official CARP website.</p>
+            `
+        }
+    },
+    collaboration: {
+        title: 'Collaboration & Support',
+        tabs: ['Research Support', 'Public Engagement', 'Private Sector'],
+        content: {
+            'Research Support': `
+                <h2>Research Collaboration</h2>
+                <p>CARP welcomes collaboration with national and international research institutions in various fields of Antarctic science.</p>
+                <h3>Collaboration Opportunities</h3>
+                <ul>
+                    <li>Joint research projects and expeditions</li>
+                    <li>Access to station facilities and equipment</li>
+                    <li>Data sharing and long-term monitoring programmes</li>
+                    <li>Student and researcher exchanges</li>
+                    <li>Laboratory analysis and technical support</li>
+                </ul>
+                <h3>International Partners</h3>
+                <p>CARP actively collaborates with leading universities and research institutions worldwide, including Charles University, University of Bergen, SLF Davos, McMurdo LTER, Instituto Antártico Argentino, British Antarctic Survey, and many others.</p>
+            `,
+            'Public Engagement': `
+                <h2>Public Engagement & Education</h2>
+                <p>CARP is committed to sharing Antarctic science with the broader public and inspiring the next generation of polar researchers.</p>
+                <h3>Educational Activities</h3>
+                <ul>
+                    <li>University courses and field training</li>
+                    <li>Public lectures and presentations</li>
+                    <li>School visits and educational programmes</li>
+                    <li>Media engagement and science communication</li>
+                    <li>Open access to research data and publications</li>
+                </ul>
+            `,
+            'Private Sector': `
+                <h2>Private Sector Collaboration</h2>
+                <p>CARP offers opportunities for private sector involvement in Antarctic research and technology development.</p>
+                <h3>Collaboration Areas</h3>
+                <ul>
+                    <li>Equipment testing in extreme conditions ("Tested in Antarctica")</li>
+                    <li>Material science and cold-weather performance</li>
+                    <li>Technology development and innovation</li>
+                    <li>Sponsorship and corporate partnerships</li>
+                    <li>Antarctic expeditions support</li>
+                </ul>
+                <p>Testing products in Antarctica provides unique validation under the harshest conditions on Earth.</p>
+            `
+        }
+    },
+    contact: {
+        title: 'Contact',
+        tabs: ['Team Contacts'],
+        content: {
+            'Team Contacts': `
+                <h2>Contact Information</h2>
+                <p><strong>Czech Antarctic Research Programme</strong><br>
+                Masaryk University, Faculty of Science<br>
+                Kotlářská 2<br>
+                611 37 BRNO, Czech Republic, Europe</p>
+
+                <div class="contact-grid">
+                    <div class="contact-person">
+                        <h4>Assoc. Prof. Daniel Nývlt, Ph.D.</h4>
+                        <div class="role">CARP Head - Geomorphologist</div>
+                        <div class="details">
+                            Tel: +420 549 49 58 46<br>
+                            Email: daniel.nyvlt@sci.muni.cz
+                        </div>
+                    </div>
+
+                    <div class="contact-person">
+                        <h4>Pavel Kapler, Ph.D.</h4>
+                        <div class="role">CARP Manager - Chief of Operations</div>
+                        <div class="details">
+                            WhatsApp: +420 773 79 88 04<br>
+                            Email: kapler@sci.muni.cz
+                        </div>
+                    </div>
+
+                    <div class="contact-person">
+                        <h4>Assoc. Prof. Kamil Láska, Ph.D.</h4>
+                        <div class="role">Atmospheric Sciences Head - Climatologist</div>
+                        <div class="details">
+                            Tel: +420 549 49 5750<br>
+                            Email: laska@sci.muni.cz
+                        </div>
+                    </div>
+
+                    <div class="contact-person">
+                        <h4>Matěj Roman, Ph.D.</h4>
+                        <div class="role">Geo-Sciences Head - Periglacial Geomorphologist</div>
+                        <div class="details">
+                            Tel: +420 704 343 653<br>
+                            Email: matej.roman@gmail.com
+                        </div>
+                    </div>
+
+                    <div class="contact-person">
+                        <h4>Professor Miloš Barták</h4>
+                        <div class="role">Plants & Ecology Head - Plant Physiologist</div>
+                        <div class="details">
+                            Tel: +420 549 49 3087<br>
+                            Email: mbartak@sci.muni.cz
+                        </div>
+                    </div>
+
+                    <div class="contact-person">
+                        <h4>Assoc. Prof. Pavel Švec, Ph.D.</h4>
+                        <div class="role">Microbiology Head - Microbiologist</div>
+                        <div class="details">
+                            Tel: +420 549 49 7601<br>
+                            Email: pavel@sci.muni.cz
+                        </div>
+                    </div>
+
+                    <div class="contact-person">
+                        <h4>Tyler Joe Kohler, Ph.D.</h4>
+                        <div class="role">LTEM Head - Ecologist</div>
+                        <div class="details">
+                            Tel: +420 221 951 073<br>
+                            Email: kohlert@natur.cuni.cz
+                        </div>
+                    </div>
+                </div>
+            `
+        }
+    }
+};
+
+// Setup info cards
+function setupInfoCards() {
+    const cards = document.querySelectorAll('.info-card');
+
+    cards.forEach(card => {
+        card.addEventListener('click', () => {
+            const cardType = card.getAttribute('data-card');
+            const data = cardData[cardType];
+
+            if (!data) return;
+
+            // Store current card data (not location)
+            currentInfoCardData = data;
+            currentLocationData = null; // Clear location data
+            currentTab = 'overview'; // Reset to first tab
+
+            // Make panel wider
+            const infoPanel = document.getElementById('info-panel');
+            infoPanel.classList.add('wide');
+
+            // Setup tabs for info card
+            setupInfoCardTabs();
+
+            // Update content
+            updateInfoCardTabContent();
+
+            // Show panel
+            infoPanel.classList.remove('hidden');
+        });
+    });
+}
+
+let currentInfoCardData = null;
+
+function setupInfoCardTabs() {
+    if (!currentInfoCardData) return;
+
+    const overviewBtn = document.getElementById('tab-overview');
+    const researchBtn = document.getElementById('tab-research');
+    const facilitiesBtn = document.getElementById('tab-facilities');
+
+    const tabs = currentInfoCardData.tabs;
+
+    // Update button labels and visibility based on number of tabs
+    if (tabs.length >= 1) {
+        overviewBtn.textContent = tabs[0];
+        overviewBtn.style.display = 'block';
+        overviewBtn.removeEventListener('click', overviewBtn._cardClickHandler);
+        overviewBtn._cardClickHandler = () => switchToInfoCardTab(0);
+        overviewBtn.addEventListener('click', overviewBtn._cardClickHandler);
+    }
+
+    if (tabs.length >= 2) {
+        researchBtn.textContent = tabs[1];
+        researchBtn.style.display = 'block';
+        researchBtn.removeEventListener('click', researchBtn._cardClickHandler);
+        researchBtn._cardClickHandler = () => switchToInfoCardTab(1);
+        researchBtn.addEventListener('click', researchBtn._cardClickHandler);
+    } else {
+        researchBtn.style.display = 'none';
+    }
+
+    if (tabs.length >= 3) {
+        facilitiesBtn.textContent = tabs[2];
+        facilitiesBtn.style.display = 'block';
+        facilitiesBtn.removeEventListener('click', facilitiesBtn._cardClickHandler);
+        facilitiesBtn._cardClickHandler = () => switchToInfoCardTab(2);
+        facilitiesBtn.addEventListener('click', facilitiesBtn._cardClickHandler);
+    } else {
+        facilitiesBtn.style.display = 'none';
+    }
+
+    // For cards with more than 3 tabs, we'll need to add extra buttons
+    // For now, we'll handle up to 3 tabs with existing buttons
+
+    // Update button positions
+    setTimeout(() => {
+        updateButtonPositions();
+    }, 0);
+
+    // Set first tab as active
+    updateInfoCardNavigationButtons();
+}
+
+function switchToInfoCardTab(tabIndex) {
+    currentTab = ['overview', 'research', 'facilities'][tabIndex]; // Keep using same tab names
+    updateInfoCardNavigationButtons();
+    updateInfoCardTabContent();
+}
+
+function updateInfoCardNavigationButtons() {
+    const overviewBtn = document.getElementById('tab-overview');
+    const researchBtn = document.getElementById('tab-research');
+    const facilitiesBtn = document.getElementById('tab-facilities');
+
+    overviewBtn.classList.remove('active');
+    researchBtn.classList.remove('active');
+    facilitiesBtn.classList.remove('active');
+
+    if (currentTab === 'overview') {
+        overviewBtn.classList.add('active');
+    } else if (currentTab === 'research') {
+        researchBtn.classList.add('active');
+    } else if (currentTab === 'facilities') {
+        facilitiesBtn.classList.add('active');
+    }
+}
+
+function updateInfoCardTabContent() {
+    if (!currentInfoCardData) return;
+
+    const content = document.getElementById('info-content');
+    const tabs = currentInfoCardData.tabs;
+    const tabIndex = ['overview', 'research', 'facilities'].indexOf(currentTab);
+    const tabName = tabs[tabIndex];
+
+    if (!tabName || !currentInfoCardData.content[tabName]) return;
+
+    // Fade out
+    content.style.opacity = '0.3';
+
+    setTimeout(() => {
+        content.innerHTML = currentInfoCardData.content[tabName];
+        content.style.opacity = '1';
+    }, 200);
+}
+
 // Start the application
 window.addEventListener('load', () => {
     init();
@@ -1593,5 +2012,6 @@ window.addEventListener('load', () => {
         setupMapControls();
         setupLanguageSwitcher();
         setupLogoReset();
+        setupInfoCards();
     }, 100);
 });
