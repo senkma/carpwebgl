@@ -613,42 +613,37 @@ function createMarker(lat, lon, icon) {
 
     group.position.set(x, y, z);
 
-    // Vintage map pin style
-    const pinGeometry = new THREE.CylinderGeometry(0.018, 0.055, 0.24, 8);
-    const pinMaterial = new THREE.MeshPhongMaterial({
-        color: 0x8b7355,  // Sepia
-        emissive: 0x6b5244,
-        emissiveIntensity: 0.15,
-        shininess: 40
-    });
-    const pin = new THREE.Mesh(pinGeometry, pinMaterial);
-    pin.rotation.x = Math.PI;
-
-    // Vintage brass-like sphere on top
-    const sphereGeometry = new THREE.SphereGeometry(0.06, 16, 16);
-    const sphereMaterial = new THREE.MeshPhongMaterial({
+    // Simple glowing dot
+    const dotGeometry = new THREE.SphereGeometry(0.025, 16, 16);
+    const dotMaterial = new THREE.MeshBasicMaterial({
         color: 0xc9a961,  // Compass gold
-        emissive: 0xc9a961,
-        emissiveIntensity: 0.3,
-        shininess: 70,
-        metalness: 0.5
-    });
-    const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-    sphere.position.y = 0.15;
-
-    // Vintage compass-style ring
-    const ringGeometry = new THREE.RingGeometry(0.08, 0.09, 32);
-    const ringMaterial = new THREE.MeshBasicMaterial({
-        color: 0xc9b18f,  // Sepia light
         transparent: true,
-        opacity: 0.4,
+        opacity: 0.9
+    });
+    const dot = new THREE.Mesh(dotGeometry, dotMaterial);
+
+    // Outer glow ring
+    const glowGeometry = new THREE.SphereGeometry(0.04, 16, 16);
+    const glowMaterial = new THREE.MeshBasicMaterial({
+        color: 0xc9a961,
+        transparent: true,
+        opacity: 0.3
+    });
+    const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+
+    // Pulsing ring
+    const ringGeometry = new THREE.RingGeometry(0.05, 0.06, 32);
+    const ringMaterial = new THREE.MeshBasicMaterial({
+        color: 0xc9a961,
+        transparent: true,
+        opacity: 0.5,
         side: THREE.DoubleSide
     });
     const ring = new THREE.Mesh(ringGeometry, ringMaterial);
     ring.rotation.x = -Math.PI / 2;
 
-    group.add(pin);
-    group.add(sphere);
+    group.add(dot);
+    group.add(glow);
     group.add(ring);
 
     // Point marker to look at globe center
@@ -896,6 +891,44 @@ function flyToLocation(locationKey) {
     targetZoom = 4;
     animationProgress = 0;
     isAnimating = true;
+
+    // Set current marker for connection line
+    const markerIndex = Object.keys(locations).indexOf(locationKey);
+    currentMarker = markers[markerIndex];
+}
+
+// Update connection line
+let currentMarker = null;
+
+function updateConnectionLine() {
+    if (!currentMarker) {
+        document.getElementById('connection-path').style.opacity = '0';
+        return;
+    }
+
+    // Get marker's screen position
+    const markerWorldPos = new THREE.Vector3();
+    currentMarker.getWorldPosition(markerWorldPos);
+
+    const markerScreenPos = markerWorldPos.clone();
+    markerScreenPos.project(camera);
+
+    const markerX = (markerScreenPos.x * 0.5 + 0.5) * window.innerWidth;
+    const markerY = (markerScreenPos.y * -0.5 + 0.5) * window.innerHeight;
+
+    // Info panel position (left side, centered)
+    const panelX = 300; // Approximate center of info panel
+    const panelY = window.innerHeight / 2;
+
+    // Create curved path
+    const controlX = (markerX + panelX) / 2;
+    const controlY = markerY;
+
+    const path = `M ${markerX} ${markerY} Q ${controlX} ${controlY}, ${panelX} ${panelY}`;
+
+    const pathElement = document.getElementById('connection-path');
+    pathElement.setAttribute('d', path);
+    pathElement.style.opacity = '1';
 }
 
 // Show location information
@@ -962,6 +995,10 @@ function resetView() {
     // Re-enable auto-rotate when returning to default view
     autoRotateEnabled = true;
     document.getElementById('info-panel').classList.add('hidden');
+
+    // Hide connection line
+    currentMarker = null;
+    updateConnectionLine();
 }
 
 // Update loading progress
@@ -1040,19 +1077,24 @@ function animate() {
 
     // Animate markers (subtle pulsing effect)
     markers.forEach(marker => {
-        const ring = marker.children[2]; // Ring is now third child
-        const sphere = marker.children[1]; // Sphere is second child
+        const ring = marker.children[2]; // Ring
+        const glow = marker.children[1]; // Outer glow
+        const dot = marker.children[0];  // Center dot
+
         if (ring) {
             const pulse = Math.sin(time * 1.5 + marker.userData.time) * 0.5 + 0.5;
-            ring.scale.set(1 + pulse * 0.15, 1 + pulse * 0.15, 1);
-            ring.material.opacity = 0.25 + pulse * 0.15;
+            ring.scale.set(1 + pulse * 0.2, 1 + pulse * 0.2, 1);
+            ring.material.opacity = 0.3 + pulse * 0.3;
         }
-        if (sphere) {
-            // Subtle glow pulsing
-            const glow = Math.sin(time * 2 + marker.userData.time) * 0.5 + 0.5;
-            sphere.material.emissiveIntensity = 0.3 + glow * 0.2;
+        if (glow) {
+            const glowPulse = Math.sin(time * 2 + marker.userData.time) * 0.5 + 0.5;
+            glow.scale.set(1 + glowPulse * 0.3, 1 + glowPulse * 0.3, 1 + glowPulse * 0.3);
+            glow.material.opacity = 0.2 + glowPulse * 0.2;
         }
     });
+
+    // Update connection line
+    updateConnectionLine();
 
     renderer.render(scene, camera);
 }

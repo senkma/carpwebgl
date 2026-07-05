@@ -37,6 +37,21 @@
     <!-- Main Canvas -->
     <canvas id="globe-canvas"></canvas>
 
+    <!-- Connection line from marker to info panel -->
+    <svg id="connection-line" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50;">
+        <defs>
+            <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#c9a961;stop-opacity:0.3" />
+                <stop offset="50%" style="stop-color:#c9a961;stop-opacity:0.8" />
+                <stop offset="100%" style="stop-color:#c9a961;stop-opacity:0.3" />
+            </linearGradient>
+        </defs>
+        <path id="connection-path" d="" stroke="url(#lineGradient)" stroke-width="3" fill="none" opacity="0"
+              stroke-dasharray="8,4" style="transition: opacity 0.5s ease; filter: drop-shadow(0 0 4px rgba(201, 169, 97, 0.6));">
+            <animate attributeName="stroke-dashoffset" from="0" to="12" dur="1.5s" repeatCount="indefinite"/>
+        </path>
+    </svg>
+
     <!-- Station Cards -->
     <div class="station-cards">
         <div class="station-card" data-location="mendel">
