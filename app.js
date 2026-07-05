@@ -12,6 +12,61 @@ let animationProgress = 0;
 let particleSystem = null;
 let connectionLines = null;
 let autoRotateEnabled = true;
+let currentLanguage = 'en';
+
+// Translations
+const translations = {
+    en: {
+        logoSubtitle: "Antarctic Explorer",
+        mendelTitle: "J.G. Mendel Station",
+        mendelLocation: "James Ross Island",
+        nelsonTitle: "Refugio CZ*ECO Nelson",
+        nelsonLocation: "Nelson Island",
+        footerText: "© 2026 Masaryk University | Czech Antarctic Research Programme",
+        controlDrag: "Drag",
+        controlDragAction: "Rotate Globe",
+        controlZoom: "Scroll",
+        controlZoomAction: "Zoom",
+        controlClick: "Click Card",
+        controlClickAction: "Fly to Location",
+        // Tab labels
+        tabJGMendel: "J.G. Mendel",
+        tabCZECONelson: "CZ*ECO Nelson",
+        tabJamesRoss: "James Ross Island",
+        tabNelsonIsland: "Nelson Island",
+        tabResearch: "Research",
+        tabMasaryk: "Masaryk University",
+        // Content headings
+        researchActivities: "Research Activities",
+        facilitiesInfra: "Facilities & Infrastructure",
+        geographicFeatures: "Geographic Features"
+    },
+    cs: {
+        logoSubtitle: "Antarktický Průzkumník",
+        mendelTitle: "Stanice J.G. Mendela",
+        mendelLocation: "Ostrov Jamese Rosse",
+        nelsonTitle: "Refugium CZ*ECO Nelson",
+        nelsonLocation: "Nelsonův ostrov",
+        footerText: "© 2026 Masarykova univerzita | Český antarktický výzkumný program",
+        controlDrag: "Tažení",
+        controlDragAction: "Otáčení glóbu",
+        controlZoom: "Kolečko",
+        controlZoomAction: "Přiblížení",
+        controlClick: "Kliknutí na kartu",
+        controlClickAction: "Let na místo",
+        // Tab labels
+        tabJGMendel: "J.G. Mendel",
+        tabCZECONelson: "CZ*ECO Nelson",
+        tabJamesRoss: "Ostrov J. Rosse",
+        tabNelsonIsland: "Nelsonův ostrov",
+        tabResearch: "Výzkum",
+        tabMasaryk: "Masarykova univerzita",
+        // Content headings
+        researchActivities: "Výzkumné aktivity",
+        facilitiesInfra: "Vybavení & Infrastruktura",
+        geographicFeatures: "Geografické charakteristiky"
+    }
+};
 
 // Location data
 const locations = {
@@ -1008,25 +1063,26 @@ function showLocationInfo(location) {
 
 // Get tab configurations based on location
 function getTabConfigs(locationData) {
+    const t = translations[currentLanguage];
     const isMasaryk = locationData.info.title === 'Masaryk University';
     const isMendel = locationData.info.title === 'J.G. Mendel Station';
     const isNelson = locationData.info.title === 'Refugio CZ*ECO Nelson';
 
     if (isMasaryk) {
         return [
-            { id: 'overview', label: 'Masaryk University' }
+            { id: 'overview', label: t.tabMasaryk }
         ];
     } else if (isMendel) {
         return [
-            { id: 'overview', label: 'J.G. Mendel' },
-            { id: 'research', label: 'James Ross Island' },
-            { id: 'facilities', label: 'Research' }
+            { id: 'overview', label: t.tabJGMendel },
+            { id: 'research', label: t.tabJamesRoss },
+            { id: 'facilities', label: t.tabResearch }
         ];
     } else if (isNelson) {
         return [
-            { id: 'overview', label: 'CZ*ECO Nelson' },
-            { id: 'research', label: 'Nelson Island' },
-            { id: 'facilities', label: 'Research' }
+            { id: 'overview', label: t.tabCZECONelson },
+            { id: 'research', label: t.tabNelsonIsland },
+            { id: 'facilities', label: t.tabResearch }
         ];
     }
 
@@ -1187,13 +1243,14 @@ function updateTabContent(skipAnimation = false) {
 
     } else if (currentTab === 'research') {
         // For Mendel/Nelson: second tab shows island info
+        const t = translations[currentLanguage];
         if (isMendel) {
             html = `
                 <img src="${image}" alt="James Ross Island" class="tab-image">
                 <h2>James Ross Island</h2>
                 <p style="color: #999; margin-bottom: 20px;">Location of J.G. Mendel Station</p>
                 <p>James Ross Island is a large island off the southeast side of the Antarctic Peninsula. The island is characterized by its unique geology, extensive Cretaceous and Tertiary sedimentary sequences, and active volcanic history.</p>
-                <h3 style="margin-top: 24px; margin-bottom: 12px; font-size: 1.1rem;">Geographic Features</h3>
+                <h3 style="margin-top: 24px; margin-bottom: 12px; font-size: 1.1rem;">${t.geographicFeatures}</h3>
                 <ul>
                     <li>Area: approximately 2,600 km²</li>
                     <li>Largely ice-covered plateau</li>
@@ -1207,7 +1264,7 @@ function updateTabContent(skipAnimation = false) {
                 <h2>Nelson Island</h2>
                 <p style="color: #999; margin-bottom: 20px;">Location of CZ*ECO Nelson Refuge</p>
                 <p>Nelson Island is an island in the South Shetland Islands, Antarctica. It is characterized by a maritime Antarctic climate with rich biodiversity and dynamic coastal ecosystems.</p>
-                <h3 style="margin-top: 24px; margin-bottom: 12px; font-size: 1.1rem;">Geographic Features</h3>
+                <h3 style="margin-top: 24px; margin-bottom: 12px; font-size: 1.1rem;">${t.geographicFeatures}</h3>
                 <ul>
                     <li>Part of South Shetland Islands</li>
                     <li>Maritime Antarctic climate</li>
@@ -1219,9 +1276,10 @@ function updateTabContent(skipAnimation = false) {
 
     } else if (currentTab === 'facilities') {
         // For Mendel/Nelson: third tab shows research
+        const t = translations[currentLanguage];
         html = `
             <img src="${image}" alt="Research at ${currentLocationData.info.title}" class="tab-image">
-            <h2>Research Activities</h2>
+            <h2>${t.researchActivities}</h2>
             <p style="color: #999; margin-bottom: 24px;">Scientific programs and ongoing research</p>
             <ul>
         `;
@@ -1234,7 +1292,7 @@ function updateTabContent(skipAnimation = false) {
 
         // Add facilities section
         html += `
-            <h3 style="margin-top: 32px; margin-bottom: 16px; font-size: 1.1rem;">Facilities & Infrastructure</h3>
+            <h3 style="margin-top: 32px; margin-bottom: 16px; font-size: 1.1rem;">${t.facilitiesInfra}</h3>
             <ul>
         `;
 
@@ -1453,11 +1511,83 @@ function setupMapControls() {
     }
 }
 
+// Language switching
+function switchLanguage(lang) {
+    currentLanguage = lang;
+
+    // Update UI texts
+    const t = translations[lang];
+
+    // Logo subtitle
+    const logoSubtitle = document.querySelector('.logo-subtitle');
+    if (logoSubtitle) logoSubtitle.textContent = t.logoSubtitle;
+
+    // Station cards
+    const mendelCard = document.querySelector('.station-card[data-location="mendel"]');
+    if (mendelCard) {
+        const title = mendelCard.querySelector('.card-title');
+        const location = mendelCard.querySelector('.card-location');
+        if (title) title.textContent = t.mendelTitle;
+        if (location) location.textContent = t.mendelLocation;
+    }
+
+    const nelsonCard = document.querySelector('.station-card[data-location="nelson"]');
+    if (nelsonCard) {
+        const title = nelsonCard.querySelector('.card-title');
+        const location = nelsonCard.querySelector('.card-location');
+        if (title) title.textContent = t.nelsonTitle;
+        if (location) location.textContent = t.nelsonLocation;
+    }
+
+    // Footer
+    const footerText = document.querySelector('.main-footer p');
+    if (footerText) footerText.textContent = t.footerText;
+
+    // Controls help
+    const controlItems = document.querySelectorAll('.control-item');
+    if (controlItems.length >= 3) {
+        const dragKey = controlItems[0].querySelector('.control-key');
+        const dragAction = controlItems[0].querySelector('.control-action');
+        if (dragKey) dragKey.textContent = '🖱️ ' + t.controlDrag;
+        if (dragAction) dragAction.textContent = t.controlDragAction;
+
+        const zoomKey = controlItems[1].querySelector('.control-key');
+        const zoomAction = controlItems[1].querySelector('.control-action');
+        if (zoomKey) zoomKey.textContent = '🔍 ' + t.controlZoom;
+        if (zoomAction) zoomAction.textContent = t.controlZoomAction;
+
+        const clickKey = controlItems[2].querySelector('.control-key');
+        const clickAction = controlItems[2].querySelector('.control-action');
+        if (clickKey) clickKey.textContent = '📍 ' + t.controlClick;
+        if (clickAction) clickAction.textContent = t.controlClickAction;
+    }
+
+    // Update active button state
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+    });
+
+    // Update info panel if open
+    if (currentLocationData) {
+        updateTabContent();
+    }
+}
+
+// Setup language switcher
+function setupLanguageSwitcher() {
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            switchLanguage(btn.dataset.lang);
+        });
+    });
+}
+
 // Start the application
 window.addEventListener('load', () => {
     init();
     // Wait a bit to ensure DOM is ready
     setTimeout(() => {
         setupMapControls();
+        setupLanguageSwitcher();
     }, 100);
 });
