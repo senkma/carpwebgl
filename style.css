@@ -505,19 +505,9 @@ body::after {
     font-style: italic;
 }
 
-/* Controls Help - Vintage map legend */
+/* Controls Help - Vintage map legend - HIDDEN */
 .controls-help {
-    position: absolute;
-    bottom: 80px;
-    left: 40px;
-    background: var(--paper-overlay);
-    backdrop-filter: blur(8px);
-    border: 4px double var(--sepia-dark);
-    border-radius: 0;
-    padding: 20px 28px;
-    box-shadow:
-        6px 6px 0 var(--ink-black),
-        inset 0 0 25px rgba(139, 115, 85, 0.12);
+    display: none;
 }
 
 .controls-help::before {

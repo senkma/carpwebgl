@@ -28,14 +28,9 @@
     display: none;
 }
 
-/* Scale legend - keep visible */
+/* Scale legend - hidden */
 .map-scale {
-    position: fixed;
-    bottom: 100px;
-    left: 50px;
-    z-index: 0;
-    opacity: 0.4;
-    pointer-events: none;
+    display: none;
 }
 
 .map-scale::before {

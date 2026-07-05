@@ -110,7 +110,7 @@ function init() {
     // Camera setup
     const aspect = window.innerWidth / window.innerHeight;
     camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
-    camera.position.set(0, 0, 8);
+    camera.position.set(0, 0, 10);  // Zvýšeno z 8 na 10 pro menší zobrazení zeměkoule
 
     // Renderer setup with transparent background
     renderer = new THREE.WebGLRenderer({
@@ -220,11 +220,11 @@ function createGlobe() {
             // Base texture
             vec4 texColor = texture2D(globeTexture, vUv);
 
-            // Realistic lighting - světlejší verze
+            // Realistic lighting - světlejší verze s více ambientem pro tmavou stranu
             vec3 lightDir = normalize(lightPosition - vPosition);
             float diff = max(dot(vNormal, lightDir), 0.0);
-            float ambient = 0.55;  // Zvýšeno z 0.4 na 0.55
-            float lighting = ambient + diff * 0.7;  // Zvýšeno z 0.6 na 0.7
+            float ambient = 0.65;  // Zvýšeno z 0.55 na 0.65 pro světlejší tmavou stranu
+            float lighting = ambient + diff * 0.65;  // Lehce upraveno
 
             gl_FragColor = vec4(texColor.rgb * lighting, 1.0);
         }
