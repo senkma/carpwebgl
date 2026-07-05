@@ -952,7 +952,7 @@ function animate() {
 
     // Very slow auto-rotate globe when not animating
     if (!isDragging && !isAnimating) {
-        globe.rotation.y += 0.0003; // Much slower rotation (0.001 -> 0.0003)
+        globe.rotation.y += 0.0001; // Even slower rotation (0.0003 -> 0.0001)
         rotationVelocity.x *= 0.95;
         rotationVelocity.y *= 0.95;
     }
