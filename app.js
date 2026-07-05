@@ -1758,10 +1758,12 @@ const cardData = {
     collaboration: {
         title: 'Collaboration & Support',
         image: 'assets/colaboration.jpg',
-        tabs: ['Czech Partners', 'International Partners'],
+        tabs: ['Research Support', 'Public Engagement', 'Private Sector'],
         content: {
-            'Czech Partners': `
-                <h2>Czech Research Institutions</h2>
+            'Research Support': `
+                <h2>Research Collaboration</h2>
+                <p>CARP welcomes collaboration with national and international research institutions in various fields of Antarctic science.</p>
+                <h3>Czech Research Institutions</h3>
                 <div class="partner-logos">
                     <a href="https://cuni.cz/UKEN-1.html" target="_blank"><img src="assets/support/uk.png" alt="Charles University"></a>
                     <a href="https://www.vut.cz/en/" target="_blank"><img src="assets/support/vut.png" alt="Brno University of Technology"></a>
@@ -1769,23 +1771,67 @@ const cardData = {
                     <a href="https://www.jcu.cz/en/" target="_blank"><img src="assets/support/jcu.png" alt="University of South Bohemia"></a>
                     <a href="https://www.osu.eu/" target="_blank"><img src="assets/support/osu.png" alt="University of Ostrava"></a>
                     <a href="https://www.cvut.cz/en" target="_blank"><img src="assets/support/cvut.jpg" alt="Czech Technical University"></a>
+                </div>
+                <h3>International Partners</h3>
+                <div class="partner-logos">
+                    <a href="http://uac.gov.ua/en/" target="_blank"><img src="assets/support/ukraine.png" alt="National Antarctic Scientific Center of Ukraine"></a>
+                    <a href="https://www.inach.cl/" target="_blank"><img src="assets/support/inach.png" alt="INACH Chile"></a>
+                </div>
+            `,
+            'Public Engagement': `
+                <h2>Public Engagement & Government Support</h2>
+                <p>CARP operates with support from Czech government institutions and collaborates with international polar organizations.</p>
+                <h3>Government Support</h3>
+                <div class="partner-logos">
+                    <a href="https://msmt.gov.cz/?lang=2" target="_blank"><img src="assets/support/msmt.jpg" alt="Ministry of Education"></a>
+                    <a href="https://mzv.gov.cz/jnp/en/index.html" target="_blank"><img src="assets/support/mzv.png" alt="Ministry of Foreign Affairs"></a>
+                    <a href="https://mzp.gov.cz/cz" target="_blank"><img src="assets/support/mzp.png" alt="Ministry of Environment"></a>
+                    <a href="https://www.antarcticfoundation.cz/en/" target="_blank"><img src="assets/support/antarctic-foundation.png" alt="Antarctic Foundation"></a>
+                </div>
+            `,
+            'Private Sector': `
+                <h2>Private Sector Collaboration</h2>
+                <p>CARP partners with leading companies for equipment testing and technology development in Antarctica.</p>
+                <h3>Our Partners</h3>
+                <div class="partner-logos">
+                    <a href="https://www.tested-in-antarctica.com/" target="_blank"><img src="assets/support/tia.png" alt="Tested in Antarctica"></a>
+                    <a href="https://www.adventuremenu.com/" target="_blank"><img src="assets/support/adventure-menu.png" alt="Adventure Menu"></a>
+                    <a href="https://www.singingrock.cz/" target="_blank"><img src="assets/support/singing-rock.jpg" alt="Singing Rock"></a>
+                    <a href="https://www.lanex.cz/cs/" target="_blank"><img src="assets/support/lanex.png" alt="LANEX"></a>
+                    <a href="https://www.gordic.cz/" target="_blank"><img src="assets/support/gordic.png" alt="Gordic"></a>
+                </div>
+            `
+        },
+        secondaryContent: {
+            'Research Support': `
+                <div class="partner-logos">
                     <a href="https://www.sci.muni.cz/en" target="_blank"><img src="assets/support/prf.png" alt="Faculty of Science MU"></a>
                     <a href="https://www.ctt.muni.cz/en" target="_blank"><img src="assets/support/ctt.png" alt="CEITEC MU"></a>
                     <a href="https://www.recetox.muni.cz/en" target="_blank"><img src="assets/support/recetox.png" alt="RECETOX"></a>
                     <a href="https://www.ceitec.eu/ceitec-but" target="_blank"><img src="assets/support/ceitec.png" alt="CEITEC BUT"></a>
                     <a href="https://www.avcr.cz/en/" target="_blank"><img src="assets/support/cas.png" alt="Czech Academy of Sciences"></a>
-                </div>
-            `,
-            'International Partners': `
-                <h2>International Collaboration</h2>
-                <div class="partner-logos">
-                    <a href="http://uac.gov.ua/en/" target="_blank"><img src="assets/support/ukraine.png" alt="National Antarctic Scientific Center of Ukraine"></a>
-                    <a href="https://www.inach.cl/" target="_blank"><img src="assets/support/inach.png" alt="INACH Chile"></a>
                     <a href="https://www.propolar.org/" target="_blank"><img src="assets/support/propolar.png" alt="ProPolar"></a>
                     <a href="https://www.marinha.mil.br/secirm/proantar" target="_blank"><img src="assets/support/proantar.png" alt="PROANTAR Brazil"></a>
                     <a href="https://www.cancilleria.gob.ar/es/iniciativas/dna/instituto-antartico-argentino" target="_blank"><img src="assets/support/iaa.png" alt="Instituto Antártico Argentino"></a>
                     <a href="https://www.bas.ac.uk/" target="_blank"><img src="assets/support/bas.png" alt="British Antarctic Survey"></a>
                 </div>
+            `,
+            'Public Engagement': `
+                <h3>International Organizations</h3>
+                <div class="partner-logos">
+                    <a href="https://www.comnap.aq/" target="_blank"><img src="assets/support/comnap.jpg" alt="COMNAP"></a>
+                    <a href="https://scar.org/" target="_blank"><img src="assets/support/scar.png" alt="SCAR"></a>
+                </div>
+            `,
+            'Private Sector': `
+                <p>Testing products in Antarctica provides unique validation under the harshest conditions on Earth.</p>
+                <p>Companies can partner with CARP for:</p>
+                <ul>
+                    <li>Equipment testing in extreme conditions</li>
+                    <li>Material science and cold-weather performance validation</li>
+                    <li>Technology development and innovation</li>
+                    <li>"Tested in Antarctica" certification</li>
+                </ul>
             `
         }
     },
@@ -1997,7 +2043,12 @@ function updateInfoCardTabContent() {
         }
 
         setTimeout(() => {
-            // Two equal columns: left with text, right with image on top and space below
+            // Get secondary content if available
+            const secondaryContent = currentInfoCardData.secondaryContent && currentInfoCardData.secondaryContent[tabName]
+                ? currentInfoCardData.secondaryContent[tabName]
+                : '';
+
+            // Two equal columns: left with text, right with image on top and secondary content below
             const html = `
                 <div class="info-left-column">
                     <div class="info-content">
@@ -2011,7 +2062,7 @@ function updateInfoCardTabContent() {
                         </div>
                     ` : ''}
                     <div class="info-secondary">
-                        <!-- Space for individual content per card -->
+                        ${secondaryContent}
                     </div>
                 </div>
             `;

@@ -895,7 +895,7 @@ body::after {
 .info-panel.wide .info-secondary {
     flex: 1;
     padding: 40px;
-    overflow-y: auto;
+    overflow-y: hidden;
 }
 
 /* Adjust tab arrow positions for wide panel */
@@ -903,12 +903,12 @@ body::after {
     right: -115px;
 }
 
-/* Partner logos grid */
+/* Partner logos grid - 2 columns for wide panel */
 .partner-logos {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 30px;
-    margin-top: 30px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-top: 20px;
     align-items: center;
     justify-items: center;
 }
