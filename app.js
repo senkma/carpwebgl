@@ -23,6 +23,11 @@ const locations = {
             title: "J.G. Mendel Station",
             subtitle: "James Ross Island, Antarctica",
             description: "The Johann Gregor Mendel Czech Antarctic Station is the primary research facility of the Czech Antarctic Research Programme. Located on James Ross Island in the Antarctic Peninsula region, it serves as a hub for cutting-edge polar research.",
+            images: {
+                overview: "assets/jgm.png",
+                research: "assets/jgm.png",
+                facilities: "assets/jgm.png"
+            },
             stats: [
                 { label: "Established", value: "2006" },
                 { label: "Location", value: "James Ross Island" },
@@ -51,6 +56,11 @@ const locations = {
             title: "Refugio CZ*ECO Nelson",
             subtitle: "Nelson Island, South Shetland Islands",
             description: "A field refuge located on Nelson Island, providing support for ecological and environmental research in the maritime Antarctic region. This facility enables year-round scientific activities in one of the most dynamic Antarctic environments.",
+            images: {
+                overview: "assets/nelson.jpg",
+                research: "assets/nelson.jpg",
+                facilities: "assets/nelson.jpg"
+            },
             stats: [
                 { label: "Type", value: "Field Refuge" },
                 { label: "Location", value: "Nelson Island" },
@@ -79,6 +89,11 @@ const locations = {
             title: "Masaryk University",
             subtitle: "Brno, Czech Republic",
             description: "Masaryk University in Brno is the headquarters of the Czech Antarctic Research Programme (CARP). The Faculty of Science coordinates all Antarctic research activities, manages logistics, and processes scientific data collected from Antarctic stations.",
+            images: {
+                overview: "assets/muni.jpg",
+                research: "assets/muni.jpg",
+                facilities: "assets/muni.jpg"
+            },
             stats: [
                 { label: "Founded", value: "1919" },
                 { label: "Students", value: "30,000+" },
@@ -944,55 +959,118 @@ function updateConnectionLine() {
 // Current active tab and location
 let currentLocationData = null;
 let currentTab = 'overview';
+const tabOrder = ['overview', 'research', 'facilities'];
 
-// Show location information with tabs
+// Show location information with side navigation
 function showLocationInfo(location) {
     currentLocationData = location;
     currentTab = 'overview';
 
     const panel = document.getElementById('info-panel');
-    const tabsContainer = document.getElementById('info-tabs');
 
-    // Create tabs
-    tabsContainer.innerHTML = `
-        <button class="info-tab active" data-tab="overview">Overview</button>
-        <button class="info-tab" data-tab="research">Research</button>
-        <button class="info-tab" data-tab="facilities">Facilities</button>
-    `;
-
-    // Add click handlers to tabs
-    const tabs = tabsContainer.querySelectorAll('.info-tab');
-    tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            currentTab = tab.dataset.tab;
-            updateTabContent();
-        });
-    });
+    // Setup navigation arrows
+    setupTabNavigation();
 
     updateTabContent();
     panel.classList.remove('hidden');
 }
 
+// Setup navigation tabs
+function setupTabNavigation() {
+    const overviewBtn = document.getElementById('tab-overview');
+    const researchBtn = document.getElementById('tab-research');
+    const facilitiesBtn = document.getElementById('tab-facilities');
+
+    // Add click handlers
+    overviewBtn.addEventListener('click', () => switchToTab('overview'));
+    researchBtn.addEventListener('click', () => switchToTab('research'));
+    facilitiesBtn.addEventListener('click', () => switchToTab('facilities'));
+
+    updateNavigationButtons();
+}
+
+// Switch to a specific tab
+function switchToTab(tabName) {
+    if (tabName === currentTab) return;
+
+    const currentIndex = tabOrder.indexOf(currentTab);
+    const newIndex = tabOrder.indexOf(tabName);
+    const direction = newIndex > currentIndex ? 'left' : 'right';
+
+    animateTabTransition(direction, () => {
+        currentTab = tabName;
+        updateTabContent(true);
+    });
+}
+
+// Navigate to next/previous tab
+function navigateTab(direction) {
+    const currentIndex = tabOrder.indexOf(currentTab);
+    const newIndex = currentIndex + direction;
+
+    if (newIndex >= 0 && newIndex < tabOrder.length) {
+        const slideDirection = direction > 0 ? 'left' : 'right';
+        animateTabTransition(slideDirection, () => {
+            currentTab = tabOrder[newIndex];
+            updateTabContent(true);
+        });
+    }
+}
+
+// Animate tab transition
+function animateTabTransition(direction, callback) {
+    const content = document.getElementById('info-content');
+    const className = direction === 'left' ? 'slide-out-left' : 'slide-out-right';
+
+    content.classList.add(className);
+
+    setTimeout(() => {
+        callback();
+        content.classList.remove(className);
+        content.classList.add('slide-in');
+
+        setTimeout(() => {
+            content.classList.remove('slide-in');
+        }, 400);
+    }, 200);
+}
+
+// Update navigation buttons state
+function updateNavigationButtons() {
+    const overviewBtn = document.getElementById('tab-overview');
+    const researchBtn = document.getElementById('tab-research');
+    const facilitiesBtn = document.getElementById('tab-facilities');
+
+    // Remove active class from all
+    overviewBtn.classList.remove('active');
+    researchBtn.classList.remove('active');
+    facilitiesBtn.classList.remove('active');
+
+    // Add active class to current tab
+    if (currentTab === 'overview') {
+        overviewBtn.classList.add('active');
+    } else if (currentTab === 'research') {
+        researchBtn.classList.add('active');
+    } else if (currentTab === 'facilities') {
+        facilitiesBtn.classList.add('active');
+    }
+}
+
 // Update tab content based on current tab
-function updateTabContent() {
+function updateTabContent(skipAnimation = false) {
     if (!currentLocationData) return;
 
     const content = document.getElementById('info-content');
-    const tabs = document.querySelectorAll('.info-tab');
 
-    // Update active tab styling
-    tabs.forEach(tab => {
-        if (tab.dataset.tab === currentTab) {
-            tab.classList.add('active');
-        } else {
-            tab.classList.remove('active');
-        }
-    });
+    // Update navigation buttons
+    updateNavigationButtons();
 
     let html = '';
+    const image = currentLocationData.info.images[currentTab];
 
     if (currentTab === 'overview') {
         html = `
+            <img src="${image}" alt="${currentLocationData.info.title}" class="tab-image">
             <h2>${currentLocationData.info.title}</h2>
             <p style="color: #999; margin-bottom: 20px; font-size: 0.9rem;">${currentLocationData.info.subtitle}</p>
             <p>${currentLocationData.info.description}</p>
@@ -1012,6 +1090,7 @@ function updateTabContent() {
 
     } else if (currentTab === 'research') {
         html = `
+            <img src="${image}" alt="Research at ${currentLocationData.info.title}" class="tab-image">
             <h2>Research Activities</h2>
             <p style="color: #999; margin-bottom: 24px;">Scientific programs and ongoing research at ${currentLocationData.info.title}</p>
             <ul>
@@ -1025,6 +1104,7 @@ function updateTabContent() {
 
     } else if (currentTab === 'facilities') {
         html = `
+            <img src="${image}" alt="Facilities at ${currentLocationData.info.title}" class="tab-image">
             <h2>Facilities & Infrastructure</h2>
             <p style="color: #999; margin-bottom: 24px;">Available facilities and infrastructure at ${currentLocationData.info.title}</p>
             <ul>

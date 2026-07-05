@@ -374,7 +374,7 @@ body::after {
     border: none;
     border-radius: 20px;
     padding: 0;
-    overflow: hidden;
+    overflow: visible;
     box-shadow:
         0 20px 60px rgba(0, 0, 0, 0.3),
         0 0 0 1px rgba(0, 0, 0, 0.05);
@@ -414,55 +414,100 @@ body::after {
     transform: scale(1.05);
 }
 
-/* Navigation tabs */
+/* Hide tabs - navigation is now on sides */
 .info-tabs {
-    display: flex;
-    gap: 8px;
-    padding: 20px 20px 0 20px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-    background: rgba(0, 0, 0, 0.02);
-}
-
-.info-tab {
-    padding: 12px 20px;
-    background: transparent;
-    border: none;
-    border-radius: 10px 10px 0 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: #666;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-}
-
-.info-tab:hover {
-    color: #333;
-    background: rgba(0, 0, 0, 0.03);
-}
-
-.info-tab.active {
-    color: #000;
-    background: #fff;
-    font-weight: 600;
-}
-
-.info-tab.active::after {
-    content: '';
-    position: absolute;
-    bottom: -1px;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: #c9a961;
+    display: none;
 }
 
 /* Info content wrapper */
 .info-content-wrapper {
-    padding: 30px;
+    padding: 40px;
     overflow-y: auto;
-    max-height: calc(80vh - 80px);
+    max-height: 80vh;
+    position: relative;
+    border-radius: 20px;
+}
+
+/* Navigation tabs - stacked vertically on right edge */
+.tab-nav-arrow {
+    position: absolute;
+    right: -115px;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px 0 0 12px;
+    border-right: none;
+    color: #888;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 5;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    padding: 12px 18px;
+    white-space: nowrap;
+    box-shadow: -2px 2px 6px rgba(0, 0, 0, 0.06);
+    width: 115px;
+    text-align: left;
+}
+
+.tab-nav-arrow:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.75);
+    color: #666;
+}
+
+.tab-nav-arrow.active {
+    background: rgba(255, 255, 255, 0.97);
+    color: #1a1a1a;
+    font-weight: 700;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    z-index: 6;
+}
+
+#tab-overview {
+    top: 80px;
+}
+
+#tab-research {
+    top: 140px;
+}
+
+#tab-facilities {
+    top: 200px;
+}
+
+/* Content container for slide animation */
+.info-content {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.info-content.slide-out-left {
+    opacity: 0;
+    transform: translateX(-30px);
+}
+
+.info-content.slide-out-right {
+    opacity: 0;
+    transform: translateX(30px);
+}
+
+.info-content.slide-in {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Image in content */
+.tab-image {
+    width: 100%;
+    height: 240px;
+    border-radius: 16px;
+    object-fit: cover;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
 .info-content h2 {
