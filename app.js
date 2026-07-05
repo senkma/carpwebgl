@@ -787,8 +787,8 @@ function onMouseMove(event) {
             y: event.clientY - previousMousePosition.y
         };
 
-        rotationVelocity.x = deltaMove.y * 0.005;
-        rotationVelocity.y = deltaMove.x * 0.005;
+        rotationVelocity.x = deltaMove.y * 0.003;
+        rotationVelocity.y = deltaMove.x * 0.003;
 
         previousMousePosition = {
             x: event.clientX,
@@ -834,8 +834,8 @@ function onTouchMove(event) {
             y: event.touches[0].clientY - previousMousePosition.y
         };
 
-        rotationVelocity.x = deltaMove.y * 0.005;
-        rotationVelocity.y = deltaMove.x * 0.005;
+        rotationVelocity.x = deltaMove.y * 0.003;
+        rotationVelocity.y = deltaMove.x * 0.003;
 
         previousMousePosition = {
             x: event.touches[0].clientX,
@@ -863,10 +863,41 @@ window.addEventListener('mouseup', () => {
     isDragging = false;
 });
 
+let wheelAnimationId = null;
+let wheelTargetZoom = null;
+
 function onMouseWheel(event) {
     event.preventDefault();
-    const delta = event.deltaY * 0.001;
-    camera.position.z = Math.max(3, Math.min(15, camera.position.z + delta));
+    const delta = event.deltaY * 0.01;
+
+    // Set new target zoom
+    if (wheelTargetZoom === null) {
+        wheelTargetZoom = camera.position.z;
+    }
+    wheelTargetZoom = Math.max(3, Math.min(15, wheelTargetZoom + delta));
+
+    // Start smooth animation if not already running
+    if (!wheelAnimationId) {
+        animateWheelZoom();
+    }
+}
+
+function animateWheelZoom() {
+    if (wheelTargetZoom === null) {
+        wheelAnimationId = null;
+        return;
+    }
+
+    const diff = wheelTargetZoom - camera.position.z;
+
+    if (Math.abs(diff) > 0.01) {
+        camera.position.z += diff * 0.2;
+        wheelAnimationId = requestAnimationFrame(animateWheelZoom);
+    } else {
+        camera.position.z = wheelTargetZoom;
+        wheelTargetZoom = null;
+        wheelAnimationId = null;
+    }
 }
 
 function onWindowResize() {
