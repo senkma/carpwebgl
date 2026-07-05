@@ -202,8 +202,6 @@ body::after {
     align-items: center;
     background: linear-gradient(180deg, var(--glass-vintage) 0%, transparent 25%);
     backdrop-filter: blur(8px);
-    border-bottom: 3px double var(--compass-gold);
-    box-shadow: 0 2px 0 var(--sepia-dark);
 }
 
 .logo {
@@ -369,7 +367,7 @@ body::after {
 /* Social Icons in Footer */
 .footer-social {
     display: flex;
-    gap: 16px;
+    gap: 12px;
     align-items: center;
 }
 
@@ -377,8 +375,8 @@ body::after {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.1);
     color: var(--sepia-dark);
@@ -394,8 +392,8 @@ body::after {
 }
 
 .social-icon svg {
-    width: 18px;
-    height: 18px;
+    width: 14px;
+    height: 14px;
 }
 
 /* Info Panel - Modern Clean Design */
@@ -716,17 +714,23 @@ body::after {
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 22px 50px;
+    padding: 18px 50px;
     text-align: center;
     background: linear-gradient(0deg, var(--glass-vintage) 0%, transparent 25%);
     backdrop-filter: blur(8px);
-    border-top: 3px double var(--compass-gold);
-    box-shadow: 0 -2px 0 var(--sepia-dark);
-    font-size: 0.8rem;
-    color: var(--old-paper);
-    opacity: 0.9;
+    font-size: 0.85rem;
+    color: #1a1a1a;
+    opacity: 1;
     font-family: 'Georgia', serif;
-    font-style: italic;
+    font-style: normal;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.main-footer p {
+    margin: 0;
+    color: #1a1a1a;
 }
 
 /* Station Cards Container */
