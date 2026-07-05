@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CARP - Czech Antarctic Research Programme | Interactive Globe</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loading-content">
+            <div class="loading-logo">
+                <div class="globe-loader"></div>
+            </div>
+            <h1 class="loading-title">CARP</h1>
+            <p class="loading-subtitle">Czech Antarctic Research Programme</p>
+            <div class="loading-bar">
+                <div class="loading-progress" id="loading-progress"></div>
+            </div>
+            <p class="loading-text" id="loading-text">Initializing WebGL...</p>
+        </div>
+    </div>
+
+    <!-- Main Canvas -->
+    <canvas id="globe-canvas"></canvas>
+
+    <!-- UI Overlay -->
+    <div id="ui-overlay">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="logo">
+                <span class="logo-carp">CARP</span>
+                <span class="logo-subtitle">Antarctic Explorer</span>
+            </div>
+            <nav class="main-nav">
+                <a href="https://carp.sci.muni.cz" target="_blank" class="nav-link">Official Site</a>
+                <button class="nav-button" id="reset-view">Reset View</button>
+            </nav>
+        </header>
+
+        <!-- Location Cards -->
+        <div class="location-cards" id="location-cards">
+            <div class="location-card" data-location="mendel">
+                <div class="card-icon">🏔️</div>
+                <h3>J.G. Mendel Station</h3>
+                <p>James Ross Island, Antarctica</p>
+                <div class="card-coords">63.8°S, 57.9°W</div>
+            </div>
+            <div class="location-card" data-location="nelson">
+                <div class="card-icon">🏕️</div>
+                <h3>Refugio CZ*ECO Nelson</h3>
+                <p>Nelson Island, Antarctica</p>
+                <div class="card-coords">62.3°S, 59.0°W</div>
+            </div>
+            <div class="location-card" data-location="brno">
+                <div class="card-icon">🏛️</div>
+                <h3>Masaryk University</h3>
+                <p>Brno, Czech Republic</p>
+                <div class="card-coords">49.2°N, 16.6°E</div>
+            </div>
+        </div>
+
+        <!-- Info Panel -->
+        <div class="info-panel hidden" id="info-panel">
+            <button class="close-btn" id="close-panel">×</button>
+            <div class="info-content" id="info-content">
+                <!-- Dynamic content will be inserted here -->
+            </div>
+        </div>
+
+        <!-- Controls Help -->
+        <div class="controls-help">
+            <div class="control-item">
+                <span class="control-key">🖱️ Drag</span>
+                <span class="control-action">Rotate Globe</span>
+            </div>
+            <div class="control-item">
+                <span class="control-key">🔍 Scroll</span>
+                <span class="control-action">Zoom</span>
+            </div>
+            <div class="control-item">
+                <span class="control-key">📍 Click Card</span>
+                <span class="control-action">Fly to Location</span>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="main-footer">
+            <p>© 2026 Masaryk University | Czech Antarctic Research Programme</p>
+        </footer>
+    </div>
+
+    <!-- Three.js from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="particles.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
