@@ -425,17 +425,17 @@ body::after {
 
 .close-btn {
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: 16px;
+    right: 16px;
     background: rgba(0, 0, 0, 0.05);
     border: none;
-    border-radius: 10px;
+    border-radius: 8px;
     color: #333;
-    font-size: 1.3rem;
+    font-size: 1rem;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    width: 36px;
-    height: 36px;
+    width: 28px;
+    height: 28px;
     line-height: 1;
     display: flex;
     align-items: center;
@@ -467,7 +467,6 @@ body::after {
 /* Navigation tabs - stacked vertically on right edge */
 .tab-nav-arrow {
     position: absolute;
-    right: -115px;
     background: rgba(255, 255, 255, 0.75);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(0, 0, 0, 0.1);
@@ -485,8 +484,9 @@ body::after {
     padding: 12px 18px;
     white-space: nowrap;
     box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.08);
-    width: 115px;
     text-align: left;
+    width: auto;
+    min-width: 115px;
 }
 
 .tab-nav-arrow:hover:not(.active) {

@@ -975,18 +975,104 @@ function showLocationInfo(location) {
     panel.classList.remove('hidden');
 }
 
+// Get tab configurations based on location
+function getTabConfigs(locationData) {
+    const isMasaryk = locationData.info.title === 'Masaryk University';
+    const isMendel = locationData.info.title === 'J.G. Mendel Station';
+    const isNelson = locationData.info.title === 'Refugio CZ*ECO Nelson';
+
+    if (isMasaryk) {
+        return [
+            { id: 'overview', label: 'Masaryk University' }
+        ];
+    } else if (isMendel) {
+        return [
+            { id: 'overview', label: 'J.G. Mendel' },
+            { id: 'research', label: 'James Ross Island' },
+            { id: 'facilities', label: 'Research' }
+        ];
+    } else if (isNelson) {
+        return [
+            { id: 'overview', label: 'CZ*ECO Nelson' },
+            { id: 'research', label: 'Nelson Island' },
+            { id: 'facilities', label: 'Research' }
+        ];
+    }
+
+    // Default fallback
+    return [
+        { id: 'overview', label: 'Overview' },
+        { id: 'research', label: 'Research' },
+        { id: 'facilities', label: 'Facilities' }
+    ];
+}
+
 // Setup navigation tabs
 function setupTabNavigation() {
     const overviewBtn = document.getElementById('tab-overview');
     const researchBtn = document.getElementById('tab-research');
     const facilitiesBtn = document.getElementById('tab-facilities');
 
-    // Add click handlers
-    overviewBtn.addEventListener('click', () => switchToTab('overview'));
-    researchBtn.addEventListener('click', () => switchToTab('research'));
-    facilitiesBtn.addEventListener('click', () => switchToTab('facilities'));
+    const tabConfigs = getTabConfigs(currentLocationData);
+
+    // Update button labels
+    if (tabConfigs.length === 1) {
+        // Masaryk University - only one tab
+        overviewBtn.textContent = tabConfigs[0].label;
+        overviewBtn.style.display = 'block';
+        researchBtn.style.display = 'none';
+        facilitiesBtn.style.display = 'none';
+    } else {
+        // Mendel or Nelson - three tabs
+        overviewBtn.textContent = tabConfigs[0].label;
+        researchBtn.textContent = tabConfigs[1].label;
+        facilitiesBtn.textContent = tabConfigs[2].label;
+        overviewBtn.style.display = 'block';
+        researchBtn.style.display = 'block';
+        facilitiesBtn.style.display = 'block';
+    }
+
+    // Add click handlers (use once = true to avoid duplicate listeners)
+    overviewBtn.removeEventListener('click', overviewBtn._clickHandler);
+    researchBtn.removeEventListener('click', researchBtn._clickHandler);
+    facilitiesBtn.removeEventListener('click', facilitiesBtn._clickHandler);
+
+    overviewBtn._clickHandler = () => switchToTab('overview');
+    researchBtn._clickHandler = () => switchToTab('research');
+    facilitiesBtn._clickHandler = () => switchToTab('facilities');
+
+    overviewBtn.addEventListener('click', overviewBtn._clickHandler);
+    researchBtn.addEventListener('click', researchBtn._clickHandler);
+    facilitiesBtn.addEventListener('click', facilitiesBtn._clickHandler);
+
+    // Update button positions based on their width
+    setTimeout(() => {
+        updateButtonPositions();
+    }, 0);
 
     updateNavigationButtons();
+}
+
+// Update button positions based on their actual width
+function updateButtonPositions() {
+    const overviewBtn = document.getElementById('tab-overview');
+    const researchBtn = document.getElementById('tab-research');
+    const facilitiesBtn = document.getElementById('tab-facilities');
+
+    if (overviewBtn.style.display !== 'none') {
+        const overviewWidth = overviewBtn.offsetWidth;
+        overviewBtn.style.right = `-${overviewWidth}px`;
+    }
+
+    if (researchBtn.style.display !== 'none') {
+        const researchWidth = researchBtn.offsetWidth;
+        researchBtn.style.right = `-${researchWidth}px`;
+    }
+
+    if (facilitiesBtn.style.display !== 'none') {
+        const facilitiesWidth = facilitiesBtn.offsetWidth;
+        facilitiesBtn.style.right = `-${facilitiesWidth}px`;
+    }
 }
 
 // Switch to a specific tab
@@ -1042,6 +1128,9 @@ function updateTabContent(skipAnimation = false) {
     // Update navigation buttons
     updateNavigationButtons();
 
+    const isMendel = currentLocationData.info.title === 'J.G. Mendel Station';
+    const isNelson = currentLocationData.info.title === 'Refugio CZ*ECO Nelson';
+
     let html = '';
     const image = currentLocationData.info.images[currentTab];
 
@@ -1066,10 +1155,43 @@ function updateTabContent(skipAnimation = false) {
         html += `</div>`;
 
     } else if (currentTab === 'research') {
+        // For Mendel/Nelson: second tab shows island info
+        if (isMendel) {
+            html = `
+                <img src="${image}" alt="James Ross Island" class="tab-image">
+                <h2>James Ross Island</h2>
+                <p style="color: #999; margin-bottom: 20px;">Location of J.G. Mendel Station</p>
+                <p>James Ross Island is a large island off the southeast side of the Antarctic Peninsula. The island is characterized by its unique geology, extensive Cretaceous and Tertiary sedimentary sequences, and active volcanic history.</p>
+                <h3 style="margin-top: 24px; margin-bottom: 12px; font-size: 1.1rem;">Geographic Features</h3>
+                <ul>
+                    <li>Area: approximately 2,600 km²</li>
+                    <li>Largely ice-covered plateau</li>
+                    <li>Volcanic mesa formations</li>
+                    <li>Rich fossil deposits</li>
+                </ul>
+            `;
+        } else if (isNelson) {
+            html = `
+                <img src="${image}" alt="Nelson Island" class="tab-image">
+                <h2>Nelson Island</h2>
+                <p style="color: #999; margin-bottom: 20px;">Location of CZ*ECO Nelson Refuge</p>
+                <p>Nelson Island is an island in the South Shetland Islands, Antarctica. It is characterized by a maritime Antarctic climate with rich biodiversity and dynamic coastal ecosystems.</p>
+                <h3 style="margin-top: 24px; margin-bottom: 12px; font-size: 1.1rem;">Geographic Features</h3>
+                <ul>
+                    <li>Part of South Shetland Islands</li>
+                    <li>Maritime Antarctic climate</li>
+                    <li>Rich coastal ecosystems</li>
+                    <li>Important penguin colonies</li>
+                </ul>
+            `;
+        }
+
+    } else if (currentTab === 'facilities') {
+        // For Mendel/Nelson: third tab shows research
         html = `
             <img src="${image}" alt="Research at ${currentLocationData.info.title}" class="tab-image">
             <h2>Research Activities</h2>
-            <p style="color: #999; margin-bottom: 24px;">Scientific programs and ongoing research at ${currentLocationData.info.title}</p>
+            <p style="color: #999; margin-bottom: 24px;">Scientific programs and ongoing research</p>
             <ul>
         `;
 
@@ -1079,11 +1201,9 @@ function updateTabContent(skipAnimation = false) {
 
         html += `</ul>`;
 
-    } else if (currentTab === 'facilities') {
-        html = `
-            <img src="${image}" alt="Facilities at ${currentLocationData.info.title}" class="tab-image">
-            <h2>Facilities & Infrastructure</h2>
-            <p style="color: #999; margin-bottom: 24px;">Available facilities and infrastructure at ${currentLocationData.info.title}</p>
+        // Add facilities section
+        html += `
+            <h3 style="margin-top: 32px; margin-bottom: 16px; font-size: 1.1rem;">Facilities & Infrastructure</h3>
             <ul>
         `;
 
