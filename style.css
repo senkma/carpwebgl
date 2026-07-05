@@ -796,7 +796,7 @@ body::after {
 
 .info-card {
     width: 180px;
-    background: linear-gradient(to bottom, #f4e8d0 0%, #e8dcc0 100%);
+    background: linear-gradient(to bottom, #f4e8d0 0%, #f4e8d0 100%);
     border: 1px solid rgba(139, 115, 85, 0.3);
     border-radius: 6px;
     overflow: hidden;
@@ -842,16 +842,19 @@ body::after {
 .info-card .card-content {
     padding: 15px;
     text-align: center;
-    background: var(--old-paper);
+    background: rgba(244, 232, 208, 0.95);
+    backdrop-filter: blur(2px);
 }
 
 .info-card .card-title {
     margin: 0;
     font-size: 14px;
     font-weight: bold;
-    color: var(--ink-black);
+    color: #1a1a1a;
     font-family: 'Georgia', serif;
     letter-spacing: 0.5px;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8),
+                 0 0 4px rgba(255, 255, 255, 0.6);
 }
 
 /* Wide panel for info cards */
@@ -967,7 +970,7 @@ body::after {
 
 /* Individual Station Card */
 .station-card {
-    background: linear-gradient(to bottom, #f4e8d0 0%, #e8dcc0 100%);
+    background: linear-gradient(to bottom, #f4e8d0 0%, #f4e8d0 100%);
     border: 1px solid rgba(139, 115, 85, 0.3);
     border-radius: 6px;
     width: 220px;
@@ -1012,7 +1015,7 @@ body::after {
 
 .card-content {
     padding: 15px;
-    background: var(--old-paper);
+    background: rgba(244, 232, 208, 0.95);
 }
 
 .card-title {
@@ -1051,7 +1054,7 @@ body::after {
     top: 50%;
     right: 40px;
     transform: translateY(-50%);
-    background: linear-gradient(to bottom, #f4e8d0 0%, #e8dcc0 100%);
+    background: linear-gradient(to bottom, #f4e8d0 0%, #f4e8d0 100%);
     border: 1px solid rgba(139, 115, 85, 0.3);
     border-radius: 6px;
     width: 220px;
@@ -1109,7 +1112,7 @@ body::after {
 
 .university-card .card-content {
     padding: 15px;
-    background: var(--old-paper);
+    background: rgba(244, 232, 208, 0.95);
 }
 
 .university-card .card-title {
