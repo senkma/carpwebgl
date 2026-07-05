@@ -785,7 +785,7 @@ body::after {
 /* Map Controls */
 .map-controls {
     position: fixed;
-    right: 30px;
+    right: 50px;
     bottom: 80px;
     display: flex;
     flex-direction: column;
