@@ -603,7 +603,6 @@ body::after {
 }
 
 .station-card:hover {
-    transform: translateY(-8px) scale(1.03);
     box-shadow:
         0 6px 16px rgba(92, 74, 58, 0.15),
         0 12px 32px rgba(92, 74, 58, 0.1),
@@ -701,7 +700,6 @@ body::after {
 }
 
 .university-card:hover {
-    transform: translateY(-50%) translateX(-8px) scale(1.03);
     box-shadow:
         0 6px 16px rgba(92, 74, 58, 0.15),
         0 12px 32px rgba(92, 74, 58, 0.1),
