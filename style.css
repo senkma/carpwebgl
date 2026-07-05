@@ -368,8 +368,8 @@ body::after {
     left: 40px;
     top: 50%;
     transform: translateY(-50%);
-    max-width: 520px;
-    max-height: 80vh;
+    width: 520px;
+    height: 750px;
     background: rgba(255, 255, 255, 0.97);
     border: none;
     border-radius: 20px;
@@ -423,7 +423,7 @@ body::after {
 .info-content-wrapper {
     padding: 40px;
     overflow-y: auto;
-    max-height: 80vh;
+    height: 750px;
     position: relative;
     border-radius: 20px;
 }
@@ -432,14 +432,14 @@ body::after {
 .tab-nav-arrow {
     position: absolute;
     right: -115px;
-    background: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.75);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    border-radius: 12px 0 0 12px;
-    border-right: none;
-    color: #888;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 0 12px 12px 0;
+    border-left: none;
+    color: #444;
     font-size: 0.75rem;
-    font-weight: 500;
+    font-weight: 600;
     letter-spacing: 0.5px;
     text-transform: uppercase;
     cursor: pointer;
@@ -448,23 +448,24 @@ body::after {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
     padding: 12px 18px;
     white-space: nowrap;
-    box-shadow: -2px 2px 6px rgba(0, 0, 0, 0.06);
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.08);
     width: 115px;
     text-align: left;
 }
 
 .tab-nav-arrow:hover:not(.active) {
-    background: rgba(255, 255, 255, 0.75);
-    color: #666;
+    background: rgba(255, 255, 255, 0.85);
+    color: #222;
 }
 
 .tab-nav-arrow.active {
     background: rgba(255, 255, 255, 0.97);
     color: #1a1a1a;
     font-weight: 700;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-left: none;
+    border-radius: 0 12px 12px 0;
+    box-shadow: 2px 4px 16px rgba(0, 0, 0, 0.15);
     z-index: 6;
 }
 
@@ -480,27 +481,21 @@ body::after {
     top: 200px;
 }
 
-/* Content container for slide animation */
+/* Content container - minimal subtle fade */
 .info-content {
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.info-content.slide-out-left {
-    opacity: 0;
-    transform: translateX(-30px);
-}
-
-.info-content.slide-out-right {
-    opacity: 0;
-    transform: translateX(30px);
-}
-
-.info-content.slide-in {
+    transition: opacity 0.2s ease-in-out;
     opacity: 1;
-    transform: translateX(0);
 }
 
-/* Image in content */
+.info-content.fade-out {
+    opacity: 0.3;
+}
+
+.info-content.fade-in {
+    opacity: 1;
+}
+
+/* Image in content - no fade effect */
 .tab-image {
     width: 100%;
     height: 240px;
@@ -508,6 +503,8 @@ body::after {
     object-fit: cover;
     margin-bottom: 24px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    opacity: 1 !important;
+    transition: none !important;
 }
 
 .info-content h2 {

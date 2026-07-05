@@ -993,47 +993,24 @@ function setupTabNavigation() {
 function switchToTab(tabName) {
     if (tabName === currentTab) return;
 
-    const currentIndex = tabOrder.indexOf(currentTab);
-    const newIndex = tabOrder.indexOf(tabName);
-    const direction = newIndex > currentIndex ? 'left' : 'right';
-
-    animateTabTransition(direction, () => {
-        currentTab = tabName;
-        updateTabContent(true);
-    });
-}
-
-// Navigate to next/previous tab
-function navigateTab(direction) {
-    const currentIndex = tabOrder.indexOf(currentTab);
-    const newIndex = currentIndex + direction;
-
-    if (newIndex >= 0 && newIndex < tabOrder.length) {
-        const slideDirection = direction > 0 ? 'left' : 'right';
-        animateTabTransition(slideDirection, () => {
-            currentTab = tabOrder[newIndex];
-            updateTabContent(true);
-        });
-    }
-}
-
-// Animate tab transition
-function animateTabTransition(direction, callback) {
     const content = document.getElementById('info-content');
-    const className = direction === 'left' ? 'slide-out-left' : 'slide-out-right';
 
-    content.classList.add(className);
+    // Minimal subtle fade transition
+    content.classList.add('fade-out');
 
     setTimeout(() => {
-        callback();
-        content.classList.remove(className);
-        content.classList.add('slide-in');
+        currentTab = tabName;
+        updateTabContent();
+        content.classList.remove('fade-out');
+        content.classList.add('fade-in');
 
         setTimeout(() => {
-            content.classList.remove('slide-in');
-        }, 400);
-    }, 200);
+            content.classList.remove('fade-in');
+        }, 200);
+    }, 100);
 }
+
+
 
 // Update navigation buttons state
 function updateNavigationButtons() {
