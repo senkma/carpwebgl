@@ -1981,27 +1981,58 @@ function updateInfoCardNavigationButtons() {
 function updateInfoCardTabContent() {
     if (!currentInfoCardData) return;
 
-    const content = document.getElementById('info-content');
+    const infoPanel = document.getElementById('info-panel');
+    const contentWrapper = infoPanel.querySelector('.info-content-wrapper');
     const tabs = currentInfoCardData.tabs;
     const tabIndex = ['overview', 'research', 'facilities'].indexOf(currentTab);
     const tabName = tabs[tabIndex];
 
     if (!tabName || !currentInfoCardData.content[tabName]) return;
 
-    // Fade out
-    content.style.opacity = '0.3';
-
-    setTimeout(() => {
-        // Add image at the top like station cards
-        let html = '';
-        if (currentInfoCardData.image) {
-            html += `<img src="${currentInfoCardData.image}" alt="${currentInfoCardData.title}" class="tab-image">`;
+    // For wide panel, create two-column layout
+    if (infoPanel.classList.contains('wide')) {
+        // Fade out
+        if (contentWrapper) {
+            contentWrapper.style.opacity = '0.3';
         }
-        html += currentInfoCardData.content[tabName];
 
-        content.innerHTML = html;
-        content.style.opacity = '1';
-    }, 200);
+        setTimeout(() => {
+            // Two equal columns: left with text, right with image on top and space below
+            const html = `
+                <div class="info-left-column">
+                    <div class="info-content">
+                        ${currentInfoCardData.content[tabName]}
+                    </div>
+                </div>
+                <div class="info-right-column">
+                    ${currentInfoCardData.image ? `
+                        <div class="info-image">
+                            <img src="${currentInfoCardData.image}" alt="${currentInfoCardData.title}">
+                        </div>
+                    ` : ''}
+                    <div class="info-secondary">
+                        <!-- Space for individual content per card -->
+                    </div>
+                </div>
+            `;
+
+            if (contentWrapper) {
+                contentWrapper.innerHTML = html;
+                contentWrapper.style.opacity = '1';
+            }
+        }, 200);
+    } else {
+        // Normal single column for stations
+        const content = document.getElementById('info-content');
+        if (!content) return;
+
+        content.style.opacity = '0.3';
+
+        setTimeout(() => {
+            content.innerHTML = currentInfoCardData.content[tabName];
+            content.style.opacity = '1';
+        }, 200);
+    }
 }
 
 // Start the application
