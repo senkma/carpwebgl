@@ -907,18 +907,10 @@ function updateConnectionLine() {
     const pathElement = document.getElementById('connection-path');
 
     if (!pathElement) {
-        console.error('connection-path element not found!');
         return;
     }
 
     if (!currentMarker) {
-        pathElement.setAttribute('opacity', '0');
-        return;
-    }
-
-    // Check if info panel is visible
-    const infoPanel = document.getElementById('info-panel');
-    if (!infoPanel || infoPanel.classList.contains('hidden')) {
         pathElement.setAttribute('opacity', '0');
         return;
     }
@@ -1063,14 +1055,9 @@ function animate() {
 
         // Stop animating after enough time
         if (animationProgress >= 1) {
-            // Snap to final position
-            if (targetPosition) {
-                globe.rotation.y = targetPosition.y;
-                globe.rotation.x = targetPosition.x;
-            }
-            if (targetZoom !== null) {
-                camera.position.z = targetZoom;
-            }
+            // NO SNAP - just let the animation finish smoothly
+            // The last frame already got us close enough to the target
+
             // Clear rotation velocity to stop any residual movement
             rotationVelocity.x = 0;
             rotationVelocity.y = 0;
