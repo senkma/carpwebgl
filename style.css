@@ -422,7 +422,7 @@ body::after {
 /* Info content wrapper */
 .info-content-wrapper {
     padding: 40px;
-    overflow-y: auto;
+    overflow: hidden;
     height: 750px;
     position: relative;
     border-radius: 20px;
@@ -481,21 +481,38 @@ body::after {
     top: 200px;
 }
 
-/* Content container - minimal subtle fade */
+/* Content container - no fade on container */
 .info-content {
+    opacity: 1;
+}
+
+/* Fade effect only on text content */
+.info-content h2,
+.info-content h3,
+.info-content p,
+.info-content ul,
+.info-content .info-stats {
     transition: opacity 0.2s ease-in-out;
     opacity: 1;
 }
 
-.info-content.fade-out {
+.info-content.fade-out h2,
+.info-content.fade-out h3,
+.info-content.fade-out p,
+.info-content.fade-out ul,
+.info-content.fade-out .info-stats {
     opacity: 0.3;
 }
 
-.info-content.fade-in {
+.info-content.fade-in h2,
+.info-content.fade-in h3,
+.info-content.fade-in p,
+.info-content.fade-in ul,
+.info-content.fade-in .info-stats {
     opacity: 1;
 }
 
-/* Image in content - no fade effect */
+/* Image in content - always visible, no fade */
 .tab-image {
     width: 100%;
     height: 240px;
@@ -504,7 +521,6 @@ body::after {
     margin-bottom: 24px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
     opacity: 1 !important;
-    transition: none !important;
 }
 
 .info-content h2 {
