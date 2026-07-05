@@ -11,6 +11,7 @@ let targetZoom = null;
 let animationProgress = 0;
 let particleSystem = null;
 let connectionLines = null;
+let autoRotateEnabled = true;
 
 // Location data
 const locations = {
@@ -867,14 +868,29 @@ function flyToLocation(locationKey) {
     // Show info panel
     showLocationInfo(location);
 
-    // Calculate target rotation
+    // Calculate target rotation to center the location
     const lat = location.coords.lat;
     const lon = location.coords.lon;
 
+    // Simple direct mapping:
+    // rotation.y = -longitude (to face the location)
+    // rotation.x = tilt from equator
+    // Globe starts with south pole up (x = -PI/2)
+    // For south pole: x = -PI/2, for north pole: x = PI/2, for equator: x = 0
+
+    const latRad = lat * Math.PI / 180;
+    const lonRad = lon * Math.PI / 180;
+
     targetPosition = {
-        x: (lon / 180) * Math.PI,
-        y: (lat / 180) * Math.PI
+        y: -lonRad,  // Rotate to longitude
+        x: latRad    // Direct latitude angle (south pole = -PI/2, north pole = +PI/2)
     };
+
+    console.log(`Flying to ${locationKey}: lat=${lat}, lon=${lon}`);
+    console.log(`Target rotation: x=${targetPosition.x}, y=${targetPosition.y}`);
+
+    // Disable auto-rotate when viewing a specific location
+    autoRotateEnabled = false;
 
     targetZoom = 4;
     animationProgress = 0;
@@ -933,10 +949,17 @@ function showLocationInfo(location) {
 
 // Reset view
 function resetView() {
-    targetPosition = null;
-    targetZoom = 8;
+    console.log('Reset view called');
+    // Return to default Antarctica view
+    targetPosition = {
+        y: 0,  // No longitude rotation
+        x: -Math.PI / 2  // South pole (default position)
+    };
+    targetZoom = 10;  // Original zoom level
     animationProgress = 0;
     isAnimating = true;
+    // Re-enable auto-rotate when returning to default view
+    autoRotateEnabled = true;
     document.getElementById('info-panel').classList.add('hidden');
 }
 
@@ -950,8 +973,8 @@ function updateLoadingProgress(percent, text) {
 function animate() {
     requestAnimationFrame(animate);
 
-    // Very slow auto-rotate globe when not animating
-    if (!isDragging && !isAnimating) {
+    // Very slow auto-rotate globe when not animating (only if enabled)
+    if (!isDragging && !isAnimating && autoRotateEnabled) {
         globe.rotation.y += 0.0001; // Even slower rotation (0.0003 -> 0.0001)
         rotationVelocity.x *= 0.95;
         rotationVelocity.y *= 0.95;
@@ -970,21 +993,36 @@ function animate() {
     if (isAnimating) {
         animationProgress += 0.02;
 
-        if (animationProgress >= 1) {
-            animationProgress = 1;
-            isAnimating = false;
-        }
-
         // Easing function
         const eased = easeInOutCubic(animationProgress);
 
         if (targetPosition) {
-            globe.rotation.y += (targetPosition.x - globe.rotation.y) * eased * 0.1;
-            globe.rotation.x += (-targetPosition.y - globe.rotation.x) * eased * 0.1;
+            const newRotY = globe.rotation.y + (targetPosition.y - globe.rotation.y) * eased * 0.1;
+            const newRotX = globe.rotation.x + (targetPosition.x - globe.rotation.x) * eased * 0.1;
+            globe.rotation.y = newRotY;
+            globe.rotation.x = newRotX;
         }
 
-        if (targetZoom) {
+        if (targetZoom !== null) {
             camera.position.z += (targetZoom - camera.position.z) * eased * 0.1;
+        }
+
+        // Stop animating after enough time
+        if (animationProgress >= 1) {
+            // Snap to final position
+            if (targetPosition) {
+                globe.rotation.y = targetPosition.y;
+                globe.rotation.x = targetPosition.x;
+            }
+            if (targetZoom !== null) {
+                camera.position.z = targetZoom;
+            }
+            // Clear rotation velocity to stop any residual movement
+            rotationVelocity.x = 0;
+            rotationVelocity.y = 0;
+            isAnimating = false;
+            animationProgress = 0;
+            console.log('Animation complete. Final rotation:', globe.rotation.x, globe.rotation.y);
         }
     }
 
