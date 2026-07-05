@@ -737,6 +737,14 @@ function setupEventListeners() {
         });
     });
 
+    // Station cards
+    document.querySelectorAll('.station-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const locationKey = card.getAttribute('data-location');
+            flyToLocation(locationKey);
+        });
+    });
+
     // Close info panel
     document.getElementById('close-panel').addEventListener('click', () => {
         document.getElementById('info-panel').classList.add('hidden');
