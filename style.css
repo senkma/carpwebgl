@@ -796,25 +796,18 @@ body::after {
 
 .info-card {
     width: 180px;
-    background: linear-gradient(to bottom, #f4e8d0 0%, #f4e8d0 100%);
-    border: 1px solid rgba(139, 115, 85, 0.3);
-    border-radius: 6px;
-    overflow: hidden;
-    box-shadow:
-        0 4px 8px rgba(92, 74, 58, 0.12),
-        0 8px 24px rgba(92, 74, 58, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    background: transparent;
+    border: none;
+    border-radius: 6px 6px 0 0;
+    overflow: visible;
+    box-shadow: none;
     cursor: pointer;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     pointer-events: all;
 }
 
 .info-card:hover {
-    box-shadow:
-        0 6px 16px rgba(92, 74, 58, 0.15),
-        0 12px 32px rgba(92, 74, 58, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.6);
-    border-color: rgba(201, 169, 97, 0.6);
+    /* Only image zoom effect, no card highlighting */
 }
 
 .info-card .card-image {
@@ -842,8 +835,7 @@ body::after {
 .info-card .card-content {
     padding: 15px;
     text-align: center;
-    background: rgba(244, 232, 208, 0.95);
-    backdrop-filter: blur(2px);
+    background: linear-gradient(to bottom, rgba(244, 232, 208, 0.7) 0%, rgba(244, 232, 208, 0.05) 100%);
 }
 
 .info-card .card-title {
