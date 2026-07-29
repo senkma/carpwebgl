@@ -50,8 +50,8 @@ const translations = {
         weatherError: "Weather unavailable",
         weatherWind: "Wind",
         expeditionsTitle: "Expeditions 2027",
-        expeditionMendel: "J.G. Mendel Station",
-        expeditionNelson: "CZ*ECO Nelson",
+        expeditionMendel: "Mendel Group",
+        expeditionNelson: "Nelson Group",
         expeditionStay: "Stay at station",
         expeditionBoat: "Boat transfer",
         expeditionShip: "Ship transfer",
@@ -91,8 +91,8 @@ const translations = {
         weatherError: "Počasí nedostupné",
         weatherWind: "Vítr",
         expeditionsTitle: "Expedice 2027",
-        expeditionMendel: "Stanice J.G. Mendela",
-        expeditionNelson: "CZ*ECO Nelson",
+        expeditionMendel: "Mendel Group",
+        expeditionNelson: "Nelson Group",
         expeditionStay: "Pobyt na stanici",
         expeditionBoat: "Přesun člunem",
         expeditionShip: "Lodní přesun",
@@ -1005,6 +1005,16 @@ function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
+
+    // Keep fat route lines sharp after resize
+    if (expeditionRouteGroup) {
+        const res = getRouteLineResolution();
+        expeditionRouteGroup.traverse(obj => {
+            if (obj.material && obj.material.resolution) {
+                obj.material.resolution.copy(res);
+            }
+        });
+    }
 }
 
 // Fly to location animation
@@ -2409,8 +2419,8 @@ const EXPEDITION_PLACE_COORDS = {
 };
 
 const EXPEDITION_ROUTE_COLORS = {
-    mendel: 0xffd978,
-    nelson: 0xffb060
+    mendel: 0xff4d6d,  // vivid coral — readable on ice & ocean
+    nelson: 0xffc14d
 };
 
 function getExpeditionNow() {
@@ -2443,19 +2453,22 @@ function slerpUnitVectors(a, b, t) {
 
 function getRouteArcLift(startUnit, endUnit) {
     const angle = startUnit.angleTo(endUnit);
-    // Keep arcs close to the globe surface
-    return Math.min(0.16, 0.025 + angle * 0.1);
+    // Short hops (boat Marambio→Mendel) still need a visible arc above the ice
+    return Math.max(0.055, Math.min(0.18, 0.04 + angle * 0.12));
 }
 
 function buildRouteArcPoints(lat1, lon1, lat2, lon2, segments = 80) {
     const start = latLonToVector3(lat1, lon1, 1);
     const end = latLonToVector3(lat2, lon2, 1);
+    const angle = start.angleTo(end);
+    // Short segments need more samples so dashes still read clearly
+    const segs = angle < 0.08 ? 48 : segments;
     const lift = getRouteArcLift(start, end);
     const points = [];
-    for (let i = 0; i <= segments; i++) {
-        const t = i / segments;
+    for (let i = 0; i <= segs; i++) {
+        const t = i / segs;
         const p = slerpUnitVectors(start, end, t);
-        const r = 2.02 + Math.sin(t * Math.PI) * lift;
+        const r = 2.025 + Math.sin(t * Math.PI) * lift;
         points.push(p.multiplyScalar(r));
     }
     return points;
@@ -2466,64 +2479,84 @@ function pointOnRouteArc(lat1, lon1, lat2, lon2, t) {
     const end = latLonToVector3(lat2, lon2, 1);
     const lift = getRouteArcLift(start, end);
     const p = slerpUnitVectors(start, end, t);
-    return p.multiplyScalar(2.02 + Math.sin(t * Math.PI) * lift);
+    return p.multiplyScalar(2.025 + Math.sin(t * Math.PI) * lift);
+}
+
+function getRouteLineResolution() {
+    const pr = Math.min(window.devicePixelRatio || 1, 2);
+    return new THREE.Vector2(window.innerWidth * pr, window.innerHeight * pr);
 }
 
 function createRouteArcMesh(points, color, state) {
-    // Use dashed Lines (screen-space ~1px) so zoom does not fatten the route
+    // Line2 = screen-space width in pixels (visible, but does not fatten with zoom)
     const group = new THREE.Group();
-    const opacity = state === 'active' ? 1 : (state === 'done' ? 0.85 : 0.45);
-    const dashSize = state === 'pending' ? 0.06 : 0.09;
-    const gapSize = state === 'pending' ? 0.07 : 0.045;
+    const positions = [];
+    points.forEach(p => positions.push(p.x, p.y, p.z));
 
-    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    const chord = points[0].distanceTo(points[points.length - 1]);
+    const shortHop = chord < 0.35; // e.g. Marambio → Mendel boat
 
-    // Dark underlay for contrast
-    const outline = new THREE.Line(
-        geometry,
-        new THREE.LineDashedMaterial({
-            color: 0x000000,
-            transparent: true,
-            opacity: opacity * 0.55,
-            dashSize,
-            gapSize,
-            depthWrite: false
-        })
-    );
+    const opacity = state === 'active' ? 1 : (state === 'done' ? 0.88 : 0.4);
+    const linewidth = state === 'active'
+        ? (shortHop ? 7 : 5)
+        : (state === 'done' ? 3.5 : 2.2);
+    // Shorter hops need denser dashes so the path still reads as a line
+    const dashSize = shortHop ? 0.35 : (state === 'pending' ? 0.7 : 1.1);
+    const gapSize = shortHop ? 0.22 : (state === 'pending' ? 0.85 : 0.55);
+
+    if (typeof THREE.LineGeometry === 'undefined' || typeof THREE.Line2 === 'undefined') {
+        // Fallback if Line2 extras failed to load
+        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+        const line = new THREE.Line(geometry, new THREE.LineDashedMaterial({
+            color, transparent: true, opacity, dashSize: 0.08, gapSize: 0.05, depthWrite: false
+        }));
+        line.computeLineDistances();
+        group.add(line);
+        group.userData = { state, baseOpacity: opacity, color };
+        return group;
+    }
+
+    // Dark outline behind the route
+    const outlineGeom = new THREE.LineGeometry();
+    outlineGeom.setPositions(positions);
+    const outlineMat = new THREE.LineMaterial({
+        color: 0x1a0a08,
+        linewidth: linewidth + 2.5,
+        transparent: true,
+        opacity: opacity * 0.75,
+        dashed: true,
+        dashSize,
+        gapSize,
+        dashScale: 1,
+        resolution: getRouteLineResolution(),
+        depthTest: true,
+        depthWrite: false
+    });
+    const outline = new THREE.Line2(outlineGeom, outlineMat);
     outline.computeLineDistances();
+    outline.userData.isRouteLine = true;
     group.add(outline);
 
-    // Bright dashed route
-    const line = new THREE.Line(
-        geometry.clone(),
-        new THREE.LineDashedMaterial({
-            color,
-            transparent: true,
-            opacity,
-            dashSize,
-            gapSize,
-            depthWrite: false
-        })
-    );
+    // Main colored route
+    const lineGeom = new THREE.LineGeometry();
+    lineGeom.setPositions(positions);
+    const lineMat = new THREE.LineMaterial({
+        color,
+        linewidth,
+        transparent: true,
+        opacity,
+        dashed: true,
+        dashSize,
+        gapSize,
+        dashScale: 1,
+        resolution: getRouteLineResolution(),
+        depthTest: true,
+        depthWrite: false
+    });
+    const line = new THREE.Line2(lineGeom, lineMat);
     line.computeLineDistances();
+    line.userData.isRouteLine = true;
     group.add(line);
-
-    // Second pass slightly brighter for active routes
-    if (state === 'active') {
-        const glow = new THREE.Line(
-            geometry.clone(),
-            new THREE.LineDashedMaterial({
-                color: 0xffffff,
-                transparent: true,
-                opacity: 0.35,
-                dashSize: dashSize * 0.7,
-                gapSize: gapSize * 1.15,
-                depthWrite: false
-            })
-        );
-        glow.computeLineDistances();
-        group.add(glow);
-    }
 
     group.userData = { state, baseOpacity: opacity, color };
     return group;
@@ -2601,12 +2634,13 @@ function createExpeditionRoutes() {
             });
 
             if (state === 'active' && container) {
+                const t = translations[currentLanguage] || translations.en;
                 const el = document.createElement('div');
                 el.className = `expedition-traveler type-${step.type}`;
                 el.dataset.exp = exp.id;
                 el.innerHTML = `
                     <span class="expedition-traveler-icon">${EXPEDITION_ICONS[step.type] || EXPEDITION_ICONS.plane}</span>
-                    <span class="expedition-traveler-name">${exp.id === 'mendel' ? 'Mendel' : 'Nelson'}</span>
+                    <span class="expedition-traveler-name">${t[exp.nameKey] || exp.id}</span>
                 `;
                 container.appendChild(el);
 
