@@ -1260,14 +1260,14 @@ body::after {
     position: fixed;
     top: 90px;
     right: 40px;
-    bottom: 100px;
+    bottom: 40px;
     transform: none;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    gap: 0;
+    gap: 16px;
     z-index: 110;
-    width: 260px;
+    width: 280px;
     animation: fadeInRight 1s ease-out 2s both;
     pointer-events: none;
 }
@@ -1287,16 +1287,19 @@ body::after {
     }
 }
 
-/* Expedition schedule — title only, cards are separate */
+/* Expedition schedule — size to content; scroll only inside a long open card */
 .expedition-panel {
     background: transparent;
     border: none;
     border-radius: 0;
     padding: 0;
     box-shadow: none;
-    max-height: min(320px, 38vh);
-    overflow-y: auto;
-    flex-shrink: 0;
+    max-height: 100%;
+    overflow: visible;
+    flex: 0 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 .expedition-panel-title {
@@ -1308,6 +1311,7 @@ body::after {
     text-transform: uppercase;
     color: #2d2416;
     text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7);
+    flex-shrink: 0;
 }
 
 .expedition-as-of {
@@ -1317,12 +1321,16 @@ body::after {
     font-weight: 500;
     letter-spacing: 0.4px;
     color: #7a6a55;
+    flex-shrink: 0;
 }
 
 .expedition-list {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    flex: 0 1 auto;
+    min-height: 0;
+    overflow: visible;
 }
 
 .expedition-card {
@@ -1335,6 +1343,15 @@ body::after {
         0 2px 8px rgba(92, 74, 58, 0.12),
         0 4px 16px rgba(92, 74, 58, 0.08);
     backdrop-filter: blur(8px);
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.expedition-card.is-open {
+    /* grow only with content — never stretch empty space */
+    flex: 0 1 auto;
 }
 
 .expedition-card:last-child {
@@ -1354,6 +1371,7 @@ body::after {
     text-align: left;
     font: inherit;
     color: inherit;
+    flex-shrink: 0;
 }
 
 .expedition-card-toggle:hover {
@@ -1402,6 +1420,10 @@ body::after {
 .expedition-card-body {
     padding: 0 10px 8px;
     border-top: 1px solid rgba(139, 115, 85, 0.15);
+    flex: 0 1 auto;
+    max-height: min(55vh, 480px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
 }
 
 .expedition-steps {
@@ -1742,7 +1764,8 @@ body::after {
     }
 
     .expedition-panel {
-        max-height: min(240px, 32vh);
+        max-height: none;
+        overflow: visible;
         padding: 0;
     }
 
@@ -1952,7 +1975,8 @@ body::after {
     }
 
     .expedition-panel {
-        max-height: 140px;
+        max-height: none;
+        overflow: visible;
         padding: 0;
     }
 
