@@ -50,6 +50,8 @@ const translations = {
         weatherLoading: "Loading weather…",
         weatherError: "Weather unavailable",
         weatherWind: "Wind",
+        weatherMendelLabel: "J.G. Mendel",
+        weatherNelsonLabel: "Nelson Island",
         expeditionsTitle: "Expeditions 2027",
         expeditionMendel: "Mendel Group",
         expeditionNelson: "Nelson Group",
@@ -92,6 +94,8 @@ const translations = {
         weatherLoading: "Načítání počasí…",
         weatherError: "Počasí nedostupné",
         weatherWind: "Vítr",
+        weatherMendelLabel: "J.G. Mendel",
+        weatherNelsonLabel: "Nelsonův ostrov",
         expeditionsTitle: "Expedice 2027",
         expeditionMendel: "Mendel Group",
         expeditionNelson: "Nelson Group",
@@ -2768,6 +2772,9 @@ function createRouteWaypoint(lat, lon, color, state) {
     return group;
 }
 
+/** Covered by weather badges on the leader line — don't duplicate as stop labels */
+const EXPEDITION_STOP_LABEL_SKIP = new Set(['J.G. Mendel', 'Nelson Island']);
+
 function createExpeditionStopLabel(place, coords, state, expId) {
     const lang = currentLanguage;
     const el = document.createElement('div');
@@ -2843,6 +2850,7 @@ function createExpeditionRoutes() {
                 }
 
                 const labelState = state === 'pending' ? 'pending' : (state === 'active' ? 'active' : 'done');
+                if (EXPEDITION_STOP_LABEL_SKIP.has(name)) return;
                 const existing = cityLabels.get(name);
                 if (!existing || cityLabelRank[labelState] > cityLabelRank[existing.state]) {
                     cityLabels.set(name, { place, coords, state: labelState, expId: exp.id });
@@ -3131,9 +3139,10 @@ const WEATHER_STATIONS = [
         yrUrlEn: 'https://www.yr.no/en/forecast/daily-table/2-6620713',
         yrUrlCs: 'https://www.yr.no/nb/værvarsel/daglig-tabell/2-6620713',
         titleKey: 'weatherForecast',
-        // Offset badge away from marker (px)
-        offset: { x: 48, y: -28 },
-        side: 'right'
+        labelKey: 'weatherMendelLabel',
+        // Badge left + down from marker
+        offset: { x: -58, y: 36 },
+        side: 'left'
     },
     {
         id: 'nelson',
@@ -3144,8 +3153,10 @@ const WEATHER_STATIONS = [
         yrUrlEn: 'https://www.yr.no/en/forecast/daily-table/2-13353920',
         yrUrlCs: 'https://www.yr.no/nb/værvarsel/daglig-tabell/2-13353920',
         titleKey: 'weatherForecastNelson',
-        offset: { x: -48, y: -28 },
-        side: 'left'
+        labelKey: 'weatherNelsonLabel',
+        // Badge right + up from marker
+        offset: { x: 58, y: -40 },
+        side: 'right'
     }
 ];
 
@@ -3184,6 +3195,7 @@ function setupWeatherPin() {
             </svg>
             <div class="weather-pin-content" style="left:${ox}px;top:${oy}px;transform:${contentTransform}">
                 <button type="button" class="weather-pin-badge" aria-expanded="false">
+                    <span class="weather-pin-station"></span>
                     <img class="weather-pin-icon" src="" alt="" hidden>
                     <span class="weather-pin-temp">–</span>
                     <span class="weather-pin-humidity">–</span>
@@ -3262,8 +3274,10 @@ function updateWeatherPinLabels() {
         const pin = getWeatherPinEl(station.id);
         if (!pin) return;
         const title = pin.querySelector('.weather-pin-title');
+        const stationLabel = pin.querySelector('.weather-pin-station');
         const link = pin.querySelector('.weather-pin-yr-link');
         if (title) title.textContent = t[station.titleKey] || t.weatherForecast;
+        if (stationLabel) stationLabel.textContent = t[station.labelKey] || station.id;
         if (link) {
             link.textContent = 'yr.no';
             link.href = currentLanguage === 'cs' ? station.yrUrlCs : station.yrUrlEn;
