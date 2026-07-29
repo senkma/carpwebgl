@@ -201,8 +201,6 @@ const locations = {
 
 // Initialize the application
 function init() {
-    updateLoadingProgress(10, 'Preparing scene…');
-
     // Scene setup with no fog (transparent background)
     scene = new THREE.Scene();
 
@@ -221,25 +219,14 @@ function init() {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setClearColor(0x000000, 0); // Transparent background
 
-    updateLoadingProgress(30, 'Building globe…');
-
-    // Create globe
+    // Create globe (texture loads in background; canvas fades in when ready)
     createGlobe();
-
-    updateLoadingProgress(55, 'Adding atmosphere…');
 
     // Create atmosphere
     createAtmosphere();
 
-    updateLoadingProgress(70, 'Placing stations…');
-
     // Create location markers
     createMarkers();
-
-    updateLoadingProgress(85, 'Almost ready…');
-
-    // Stars removed for vintage look
-    // createStars();
 
     // Lighting
     createLights();
@@ -251,24 +238,15 @@ function init() {
     // Event listeners
     setupEventListeners();
 
-    // Particle system removed for cleaner scientific look
-    // particleSystem = new ParticleSystem(scene);
+    // Start render loop immediately — UI is already visible
+    animate();
+}
 
-    // Connection lines removed for cleaner look
-    // connectionLines = new ConnectionLines(scene, locations, globe);
-
-    updateLoadingProgress(100, 'Ready');
-
-    // Hide loading screen
-    setTimeout(() => {
-        const loadingScreen = document.getElementById('loading-screen');
-        if (!loadingScreen) return;
-        loadingScreen.classList.add('hidden');
-        animate();
-        setTimeout(() => {
-            loadingScreen.remove();
-        }, 700);
-    }, 400);
+function revealGlobe() {
+    const canvas = document.getElementById('globe-canvas');
+    if (canvas) canvas.classList.remove('globe-pending');
+    const weatherPins = document.getElementById('weather-pins');
+    if (weatherPins) weatherPins.classList.remove('globe-pending');
 }
 
 // Create the main globe with real NASA texture
@@ -277,18 +255,27 @@ function createGlobe() {
 
     // Load real Earth texture
     const textureLoader = new THREE.TextureLoader();
+    let revealed = false;
+    const doReveal = () => {
+        if (revealed) return;
+        revealed = true;
+        revealGlobe();
+    };
+    // Safety: never leave the globe hidden forever
+    setTimeout(doReveal, 12000);
 
     // Using NASA Blue Marble texture (high quality, free to use)
     const earthTexture = textureLoader.load(
         'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg',
         function(texture) {
-            updateLoadingProgress(50, 'Globe texture ready…');
+            doReveal();
         },
         undefined,
         function(error) {
             console.log('Failed to load NASA texture, using fallback');
             // Fallback if CDN fails
             createFallbackTexture();
+            doReveal();
         }
     );
 
@@ -1434,15 +1421,10 @@ function resetView() {
     rotationVelocity.y = 0;
 }
 
-// Update loading progress
-function updateLoadingProgress(percent, text) {
-    document.getElementById('loading-progress').style.width = percent + '%';
-    document.getElementById('loading-text').textContent = text;
-}
-
 // Animation loop
 function animate() {
     requestAnimationFrame(animate);
+    if (!globe || !renderer || !scene || !camera) return;
 
     // Very slow auto-rotate globe when not animating (only if enabled)
     if (!isDragging && !isAnimating && autoRotateEnabled) {

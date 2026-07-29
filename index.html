@@ -14,20 +14,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div id="loading-screen">
-        <div class="loading-content">
-            <img src="assets/muni+carp.png" alt="" class="loading-brand-logo">
-            <h1 class="loading-title">CARP</h1>
-            <p class="loading-subtitle">Czech Antarctic Research Programme</p>
-            <div class="loading-spinner" aria-hidden="true"></div>
-            <div class="loading-bar">
-                <div class="loading-progress" id="loading-progress"></div>
-            </div>
-            <p class="loading-text" id="loading-text">Loading…</p>
-        </div>
-    </div>
-
     <!-- Vintage Antarctica Map - LEFT SIDE -->
     <div class="antarctica-map">
         <div class="meridian-lines"></div>
@@ -36,8 +22,8 @@
     </div>
     <div class="map-scale"></div>
 
-    <!-- Main Canvas -->
-    <canvas id="globe-canvas"></canvas>
+    <!-- Main Canvas — fades in when Earth texture is ready -->
+    <canvas id="globe-canvas" class="globe-pending"></canvas>
 
     <!-- Connection line from marker to info panel -->
     <svg id="connection-line" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50;">
@@ -235,7 +221,7 @@
     </div>
 
     <!-- Weather pins on globe -->
-    <div id="weather-pins"></div>
+    <div id="weather-pins" class="globe-pending"></div>
 
     <!-- Three.js from CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
