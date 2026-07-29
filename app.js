@@ -45,7 +45,15 @@ const translations = {
         weatherHumidity: "Humidity",
         weatherLoading: "Loading weather…",
         weatherError: "Weather unavailable",
-        weatherWind: "Wind"
+        weatherWind: "Wind",
+        expeditionsTitle: "Expeditions 2027",
+        expeditionMendel: "J.G. Mendel Station",
+        expeditionNelson: "CZ*ECO Nelson",
+        expeditionStay: "Stay at station",
+        expeditionBoat: "Boat transfer",
+        expeditionShip: "Ship transfer",
+        expeditionFlight: "Flight",
+        expeditionHotel: "Overnight"
     },
     cs: {
         logoSubtitle: "Antarktický Průzkumník",
@@ -76,7 +84,15 @@ const translations = {
         weatherHumidity: "Vlhkost",
         weatherLoading: "Načítání počasí…",
         weatherError: "Počasí nedostupné",
-        weatherWind: "Vítr"
+        weatherWind: "Vítr",
+        expeditionsTitle: "Expedice 2027",
+        expeditionMendel: "Stanice J.G. Mendela",
+        expeditionNelson: "CZ*ECO Nelson",
+        expeditionStay: "Pobyt na stanici",
+        expeditionBoat: "Přesun člunem",
+        expeditionShip: "Lodní přesun",
+        expeditionFlight: "Let",
+        expeditionHotel: "Ubytování"
     }
 };
 
@@ -1651,6 +1667,8 @@ function switchLanguage(lang) {
             renderWeatherForecast(station.id);
         }
     });
+
+    renderExpeditions();
 }
 
 // Setup language switcher
@@ -2315,6 +2333,175 @@ function showPersonalCard(person) {
     }, 200);
 }
 
+/* ========== Expeditions 2027 schedule ========== */
+const EXPEDITION_ICONS = {
+    plane: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5L21 16z"/></svg>',
+    boat: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17.5c1.5 1.2 3.4 2 5.5 2s4-.8 5.5-2c1.5 1.2 3.4 2 5.5 2 .5 0 1-.05 1.5-.15V18c-.5.1-1 .15-1.5.15-1.7 0-3.3-.5-4.6-1.35L12 7 6.6 16.8C5.3 17.65 3.7 18.15 2 18.15c-.5 0-1-.05-1.5-.15v1.35c.5.1 1 .15 1.5.15 2.1 0 4-.8 5.5-2zM12 4l1.2 2.5H10.8L12 4z"/></svg>',
+    ship: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21c-1.39 0-2.78-.47-4-1.32-2.44 1.71-5.56 1.71-8 0C6.78 20.53 5.39 21 4 21H2v2h2c1.38 0 2.74-.35 4-.99 2.52 1.29 5.48 1.29 8 0 1.26.65 2.62.99 4 .99h2v-2h-2zM3.95 19H4c1.6 0 3.02-.88 4-2 .98 1.12 2.4 2 4 2s3.02-.88 4-2c.98 1.12 2.4 2 4 2h.05l1.22-3.04L13.2 5H11V2H6v3H4.8l-3.07 10.96L3.95 19zM6.5 7h5.6l3.86 9H6.5L8 9h2V7H6.5z"/></svg>',
+    hotel: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 13c1.66 0 3-1.34 3-3S8.66 7 7 7s-3 1.34-3 3 1.34 3 3 3zm12-6h-8v7H3V5H1v15h2v-3h18v3h2v-9c0-2.21-1.79-4-4-4z"/></svg>',
+    stay: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zm0 2.7L18 11v8h-2v-6H8v6H6v-8l6-5.3z"/></svg>'
+};
+
+const EXPEDITIONS_2027 = [
+    {
+        id: 'mendel',
+        nameKey: 'expeditionMendel',
+        start: '2027-01-05',
+        end: '2027-04-04',
+        steps: [
+            { date: '2027-01-05', type: 'plane', from: { en: 'Vienna', cs: 'Vídeň' }, to: { en: 'Madrid', cs: 'Madrid' } },
+            { date: '2027-01-05', type: 'hotel', place: { en: 'Madrid', cs: 'Madrid' } },
+            { date: '2027-01-06', type: 'plane', from: { en: 'Madrid', cs: 'Madrid' }, to: { en: 'Buenos Aires', cs: 'Buenos Aires' } },
+            { date: '2027-01-07', type: 'hotel', place: { en: 'Buenos Aires', cs: 'Buenos Aires' } },
+            { date: '2027-01-09', type: 'plane', from: { en: 'Buenos Aires', cs: 'Buenos Aires' }, to: { en: 'Ushuaia', cs: 'Ushuaia' } },
+            { date: '2027-01-10', type: 'hotel', place: { en: 'Ushuaia', cs: 'Ushuaia' } },
+            { date: '2027-01-20', type: 'plane', from: { en: 'Ushuaia', cs: 'Ushuaia' }, to: { en: 'Marambio', cs: 'Marambio' } },
+            { date: '2027-02-02', type: 'boat', from: { en: 'Marambio', cs: 'Marambio' }, to: { en: 'J.G. Mendel', cs: 'J.G. Mendel' }, noteKey: 'expeditionBoat' },
+            { date: '2027-02-02', type: 'stay', place: { en: 'J.G. Mendel Station', cs: 'Stanice J.G. Mendela' }, end: '2027-04-04', noteKey: 'expeditionStay' }
+        ]
+    },
+    {
+        id: 'nelson',
+        nameKey: 'expeditionNelson',
+        start: '2027-01-27',
+        end: '2027-03-03',
+        steps: [
+            { date: '2027-01-27', type: 'plane', from: { en: 'Vienna', cs: 'Vídeň' }, to: { en: 'Madrid', cs: 'Madrid' } },
+            { date: '2027-01-27', type: 'hotel', place: { en: 'Madrid', cs: 'Madrid' } },
+            { date: '2027-02-02', type: 'plane', from: { en: 'Madrid', cs: 'Madrid' }, to: { en: 'Santiago (SCL)', cs: 'Santiago (SCL)' }, noteKey: 'expeditionFlight' },
+            { date: '2027-02-03', type: 'hotel', place: { en: 'Santiago', cs: 'Santiago' } },
+            { date: '2027-02-04', type: 'plane', from: { en: 'Santiago (SCL)', cs: 'Santiago (SCL)' }, to: { en: 'Punta Arenas', cs: 'Punta Arenas' } },
+            { date: '2027-02-05', type: 'ship', from: { en: 'Punta Arenas', cs: 'Punta Arenas' }, to: { en: 'Nelson Island', cs: 'Nelsonův ostrov' }, noteKey: 'expeditionShip' },
+            { date: '2027-02-05', type: 'stay', place: { en: 'CZ*ECO Nelson', cs: 'CZ*ECO Nelson' }, end: '2027-03-03', noteKey: 'expeditionStay' }
+        ]
+    }
+];
+
+function setupExpeditions() {
+    renderExpeditions();
+}
+
+const expeditionOpenState = {
+    mendel: false,
+    nelson: false
+};
+
+function formatExpeditionDate(iso, lang) {
+    const d = new Date(iso + 'T12:00:00');
+    const locale = lang === 'cs' ? 'cs-CZ' : 'en-GB';
+    return d.toLocaleDateString(locale, { day: 'numeric', month: 'numeric', year: 'numeric' });
+}
+
+function formatExpeditionRange(startIso, endIso, lang) {
+    return `${formatExpeditionDate(startIso, lang)} – ${formatExpeditionDate(endIso, lang)}`;
+}
+
+function localizedPlace(place, lang) {
+    if (!place) return '';
+    return place[lang] || place.en;
+}
+
+function getExpeditionStepLabel(step, lang) {
+    const t = translations[lang];
+    if (step.type === 'plane' || step.type === 'boat' || step.type === 'ship') {
+        return `${localizedPlace(step.from, lang)} → ${localizedPlace(step.to, lang)}`;
+    }
+    if (step.type === 'hotel') {
+        return `${t.expeditionHotel}: ${localizedPlace(step.place, lang)}`;
+    }
+    if (step.type === 'stay') {
+        return `${t.expeditionStay}: ${localizedPlace(step.place, lang)}`;
+    }
+    return localizedPlace(step.place, lang);
+}
+
+function getExpeditionStepMeta(step, lang) {
+    const t = translations[lang];
+    const dateLabel = formatExpeditionDate(step.date, lang);
+    const typeLabel = step.type === 'plane' ? t.expeditionFlight
+        : step.type === 'boat' ? t.expeditionBoat
+        : step.type === 'ship' ? t.expeditionShip
+        : step.type === 'hotel' ? t.expeditionHotel
+        : t.expeditionStay;
+
+    if (step.end) {
+        return `${dateLabel} – ${formatExpeditionDate(step.end, lang)} · ${typeLabel}`;
+    }
+    return `${dateLabel} · ${typeLabel}`;
+}
+
+function isExpeditionStepPending(step, now = new Date()) {
+    // Not yet started = gray
+    const stepStart = new Date(step.date + 'T00:00:00');
+    return now < stepStart;
+}
+
+function toggleExpedition(expId) {
+    expeditionOpenState[expId] = !expeditionOpenState[expId];
+    const card = document.querySelector(`.expedition-card[data-expedition="${expId}"]`);
+    if (!card) return;
+
+    const isOpen = expeditionOpenState[expId];
+    card.classList.toggle('is-open', isOpen);
+    const btn = card.querySelector('.expedition-card-toggle');
+    const body = card.querySelector('.expedition-card-body');
+    if (btn) btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    if (body) body.hidden = !isOpen;
+}
+
+function renderExpeditions() {
+    const list = document.getElementById('expedition-list');
+    const title = document.querySelector('.expedition-panel-title');
+    if (!list) return;
+
+    const lang = currentLanguage;
+    const t = translations[lang];
+    const now = new Date();
+
+    if (title) title.textContent = t.expeditionsTitle;
+
+    list.innerHTML = EXPEDITIONS_2027.map(exp => {
+        const isOpen = !!expeditionOpenState[exp.id];
+        const stepsHtml = exp.steps.map(step => {
+            const pending = isExpeditionStepPending(step, now);
+            const icon = EXPEDITION_ICONS[step.type] || EXPEDITION_ICONS.plane;
+            return `
+                <div class="expedition-step${pending ? ' pending' : ''}">
+                    <div class="expedition-step-icon">${icon}</div>
+                    <div class="expedition-step-body">
+                        <p class="expedition-step-label">${getExpeditionStepLabel(step, lang)}</p>
+                        <p class="expedition-step-meta">${getExpeditionStepMeta(step, lang)}</p>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        return `
+            <article class="expedition-card${isOpen ? ' is-open' : ''}" data-expedition="${exp.id}">
+                <button type="button" class="expedition-card-toggle" aria-expanded="${isOpen ? 'true' : 'false'}" aria-controls="expedition-body-${exp.id}">
+                    <span class="expedition-card-header-text">
+                        <span class="expedition-card-name">${t[exp.nameKey]}</span>
+                        <span class="expedition-card-dates">${formatExpeditionRange(exp.start, exp.end, lang)}</span>
+                    </span>
+                    <span class="expedition-card-chevron" aria-hidden="true"></span>
+                </button>
+                <div class="expedition-card-body" id="expedition-body-${exp.id}" ${isOpen ? '' : 'hidden'}>
+                    <div class="expedition-steps">${stepsHtml}</div>
+                </div>
+            </article>
+        `;
+    }).join('');
+
+    list.querySelectorAll('.expedition-card-toggle').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const card = btn.closest('.expedition-card');
+            if (!card) return;
+            toggleExpedition(card.dataset.expedition);
+        });
+    });
+}
+
 /* ========== Weather pins (YR / MET Norway) ========== */
 const WEATHER_ICON_BASE = 'https://cdn.jsdelivr.net/gh/metno/weathericons@main/weather/svg/';
 
@@ -2712,5 +2899,6 @@ window.addEventListener('load', () => {
         setupLogoReset();
         setupInfoCards();
         setupWeatherPin();
+        setupExpeditions();
     }, 100);
 });

@@ -1290,7 +1290,7 @@ body::after {
 /* Hide location cards when info panel is open — only on smaller screens */
 @media (max-width: 1200px) {
     body:has(.info-panel:not(.hidden)) .station-cards,
-    body:has(.info-panel:not(.hidden)) .university-card {
+    body:has(.info-panel:not(.hidden)) .right-sidebar {
         opacity: 0;
         pointer-events: none;
         visibility: hidden;
@@ -1337,25 +1337,23 @@ body::after {
     }
 }
 
-/* University Card - positioned on the right */
-.university-card {
+/* Right sidebar - expeditions above university */
+.right-sidebar {
     position: fixed;
     top: 50%;
     right: 40px;
     transform: translateY(-50%);
-    background: linear-gradient(to bottom, #f4e8d0 0%, #f4e8d0 100%);
-    border: 1px solid rgba(139, 115, 85, 0.3);
-    border-radius: 6px;
-    width: 220px;
-    overflow: hidden;
-    box-shadow:
-        0 2px 8px rgba(92, 74, 58, 0.12),
-        0 4px 16px rgba(92, 74, 58, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.5);
-    cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
     z-index: 110;
+    width: 260px;
     animation: fadeInRight 1s ease-out 2s both;
+    pointer-events: none;
+}
+
+.right-sidebar > * {
+    pointer-events: all;
 }
 
 @keyframes fadeInRight {
@@ -1369,17 +1367,235 @@ body::after {
     }
 }
 
+/* Expedition schedule — title only, cards are separate */
+.expedition-panel {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none;
+    max-height: min(460px, 52vh);
+    overflow-y: auto;
+}
+
+.expedition-panel-title {
+    margin: 0 0 8px 4px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: #2d2416;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7);
+}
+
+.expedition-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.expedition-card {
+    margin-bottom: 0;
+    border: 1px solid rgba(139, 115, 85, 0.3);
+    border-radius: 8px;
+    background: rgba(244, 232, 208, 0.95);
+    overflow: hidden;
+    box-shadow:
+        0 2px 8px rgba(92, 74, 58, 0.12),
+        0 4px 16px rgba(92, 74, 58, 0.08);
+    backdrop-filter: blur(8px);
+}
+
+.expedition-card:last-child {
+    margin-bottom: 0;
+}
+
+.expedition-card-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 10px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+    font: inherit;
+    color: inherit;
+}
+
+.expedition-card-toggle:hover {
+    background: rgba(201, 169, 97, 0.15);
+}
+
+.expedition-card-header-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.expedition-card-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+.expedition-card-dates {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: #6b5244;
+    opacity: 0.9;
+}
+
+.expedition-card-chevron {
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid #5c4a3a;
+    border-bottom: 2px solid #5c4a3a;
+    transform: rotate(45deg);
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+    margin-right: 2px;
+}
+
+.expedition-card.is-open .expedition-card-chevron {
+    transform: rotate(-135deg);
+    margin-top: 4px;
+}
+
+.expedition-card-body {
+    padding: 0 10px 8px;
+    border-top: 1px solid rgba(139, 115, 85, 0.15);
+}
+
+.expedition-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding-top: 6px;
+}
+
+.expedition-step {
+    display: grid;
+    grid-template-columns: 22px 1fr;
+    gap: 8px;
+    align-items: start;
+    padding: 5px 0;
+    position: relative;
+    opacity: 1;
+    transition: opacity 0.25s ease, filter 0.25s ease;
+}
+
+.expedition-step::before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 24px;
+    bottom: -5px;
+    width: 1.5px;
+    background: rgba(201, 169, 97, 0.45);
+}
+
+.expedition-step:last-child::before {
+    display: none;
+}
+
+.expedition-step.pending {
+    opacity: 0.42;
+    filter: grayscale(1);
+}
+
+.expedition-step.pending::before {
+    background: rgba(120, 120, 120, 0.35);
+}
+
+.expedition-step-icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(201, 169, 97, 0.2);
+    border: 1px solid rgba(201, 169, 97, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #5c4a3a;
+    flex-shrink: 0;
+    z-index: 1;
+}
+
+.expedition-step.pending .expedition-step-icon {
+    background: rgba(140, 140, 140, 0.15);
+    border-color: rgba(140, 140, 140, 0.4);
+    color: #777;
+}
+
+.expedition-step-icon svg {
+    width: 12px;
+    height: 12px;
+    fill: currentColor;
+}
+
+.expedition-step-body {
+    min-width: 0;
+    padding-top: 1px;
+}
+
+.expedition-step-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    font-weight: 650;
+    color: #2d2416;
+    line-height: 1.25;
+    margin: 0;
+}
+
+.expedition-step-meta {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 10px;
+    color: #6b5244;
+    margin: 1px 0 0;
+    opacity: 0.85;
+}
+
+/* University Card - inside right sidebar */
+.university-card {
+    position: relative;
+    top: auto;
+    right: auto;
+    transform: none;
+    background: linear-gradient(to bottom, #f4e8d0 0%, #f4e8d0 100%);
+    border: 1px solid rgba(139, 115, 85, 0.3);
+    border-radius: 6px;
+    width: 100%;
+    overflow: hidden;
+    box-shadow:
+        0 2px 8px rgba(92, 74, 58, 0.12),
+        0 4px 16px rgba(92, 74, 58, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: auto;
+    animation: none;
+}
+
 .university-card:hover {
     box-shadow:
         0 6px 16px rgba(92, 74, 58, 0.15),
         0 12px 32px rgba(92, 74, 58, 0.1),
         inset 0 1px 0 rgba(255, 255, 255, 0.6);
     border-color: rgba(201, 169, 97, 0.6);
+    transform: translateY(-4px);
 }
 
 .university-card .card-image {
     width: 100%;
-    height: 140px;
+    height: 110px;
     overflow: hidden;
     position: relative;
     background: #d4c5a0;
@@ -1449,9 +1665,9 @@ body::after {
         width: min(900px, calc(100vw - 60px));
     }
 
-    .university-card {
+    .right-sidebar {
         right: 24px;
-        width: 180px;
+        width: 220px;
     }
 
     .university-card .card-image {
@@ -1545,14 +1761,15 @@ body::after {
         font-size: 1.4rem;
     }
 
-    .university-card {
-        top: auto;
-        bottom: 30px;
-        right: 20px;
-        transform: none;
-        width: 160px;
-        animation: none;
-        opacity: 1;
+    .right-sidebar {
+        right: 16px;
+        width: 200px;
+        gap: 10px;
+    }
+
+    .expedition-panel {
+        max-height: min(280px, 40vh);
+        padding: 0;
     }
 
     .university-card .card-image {
@@ -1737,14 +1954,32 @@ body::after {
         padding: 12px;
     }
 
-    .university-card {
+    .right-sidebar {
         top: auto;
         bottom: 70px;
         right: 12px;
-        left: auto;
-        width: 130px;
         transform: none;
+        width: 150px;
         animation: none;
+        max-height: 40vh;
+    }
+
+    .expedition-panel {
+        max-height: 180px;
+        padding: 0;
+    }
+
+    .expedition-panel-title {
+        font-size: 11px;
+        margin-bottom: 6px;
+    }
+
+    .expedition-step-label {
+        font-size: 10px;
+    }
+
+    .expedition-step-meta {
+        font-size: 9px;
     }
 
     .university-card:hover {
@@ -1852,10 +2087,14 @@ body::after {
         left: 175px;
     }
 
-    .university-card {
+    .right-sidebar {
         bottom: 62px;
         right: 8px;
-        width: 110px;
+        width: 120px;
+    }
+
+    .expedition-panel {
+        display: none;
     }
 
     .university-card .card-image {
