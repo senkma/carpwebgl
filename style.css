@@ -794,9 +794,16 @@ body::after {
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    gap: 20px;
+    gap: 4px;
     z-index: 150;
     pointer-events: none;
+    padding: 6px 10px;
+    background: rgba(244, 232, 208, 0.88);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 8px;
+    border: 1px solid rgba(139, 115, 85, 0.25);
+    box-shadow: 0 2px 12px rgba(45, 36, 22, 0.15);
 }
 
 .info-card {
@@ -806,29 +813,31 @@ body::after {
     overflow: visible;
     box-shadow: none;
     cursor: pointer;
-    transition: opacity 0.3s ease;
+    transition: background 0.25s ease, opacity 0.25s ease;
     pointer-events: all;
+    border-radius: 5px;
 }
 
 .info-card:hover {
-    opacity: 0.7;
+    background: rgba(201, 169, 97, 0.35);
+    opacity: 1;
 }
 
 .info-card .card-content {
-    padding: 8px 12px;
+    padding: 8px 14px;
     text-align: center;
     background: transparent;
 }
 
 .info-card .card-title {
     margin: 0;
-    font-size: 14px;
-    font-weight: bold;
-    color: #1a1a1a;
-    font-family: 'Georgia', serif;
-    letter-spacing: 0.5px;
-    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8),
-                 0 0 4px rgba(255, 255, 255, 0.6);
+    font-size: 15px;
+    font-weight: 600;
+    color: #2d2416;
+    font-family: 'Rajdhani', sans-serif;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-shadow: none;
     white-space: nowrap;
 }
 
@@ -1479,7 +1488,8 @@ body:has(.info-panel:not(.hidden)) .university-card {
     }
 
     .info-card .card-title {
-        font-size: 12px;
+        font-size: 13px;
+        letter-spacing: 0.8px;
     }
 
     .info-card .card-content {
@@ -1595,21 +1605,22 @@ body:has(.info-panel:not(.hidden)) .university-card {
 
     .top-info-cards {
         top: 52px;
-        left: 0;
-        right: 0;
+        left: 8px;
+        right: 8px;
         transform: none;
         max-width: none;
-        width: 100%;
+        width: auto;
         gap: 0;
-        padding: 0 8px;
-        justify-content: space-between;
-        flex-wrap: nowrap;
+        padding: 4px 6px;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
+        justify-content: space-between;
+        flex-wrap: nowrap;
     }
 
     .info-card .card-title {
-        font-size: 11px;
+        font-size: 12px;
+        letter-spacing: 0.5px;
         white-space: nowrap;
     }
 
@@ -1814,8 +1825,8 @@ body:has(.info-panel:not(.hidden)) .university-card {
     }
 
     .info-card .card-title {
-        font-size: 10px;
-        letter-spacing: 0;
+        font-size: 11px;
+        letter-spacing: 0.3px;
     }
 
     .info-panel,
