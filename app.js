@@ -53,7 +53,9 @@ const translations = {
         expeditionBoat: "Boat transfer",
         expeditionShip: "Ship transfer",
         expeditionFlight: "Flight",
-        expeditionHotel: "Overnight"
+        expeditionHotel: "Overnight",
+        expeditionInProgress: "In progress",
+        expeditionAsOf: "Status as of"
     },
     cs: {
         logoSubtitle: "Antarktický Průzkumník",
@@ -92,7 +94,9 @@ const translations = {
         expeditionBoat: "Přesun člunem",
         expeditionShip: "Lodní přesun",
         expeditionFlight: "Let",
-        expeditionHotel: "Ubytování"
+        expeditionHotel: "Ubytování",
+        expeditionInProgress: "Probíhá",
+        expeditionAsOf: "Stav ke dni"
     }
 };
 
@@ -2369,6 +2373,20 @@ const expeditionOpenState = {
     nelson: false
 };
 
+// Demo timeline: ~2 Feb 2027 — Mendel boat to station, Nelson Madrid→Santiago (Atlantic)
+const EXPEDITION_SIMULATED_NOW = new Date('2027-02-02T14:00:00');
+
+function getExpeditionNow() {
+    return EXPEDITION_SIMULATED_NOW;
+}
+
+function toIsoDate(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+}
+
 function formatExpeditionDate(iso, lang) {
     const d = new Date(iso + 'T12:00:00');
     const locale = lang === 'cs' ? 'cs-CZ' : 'en-GB';
@@ -2413,10 +2431,38 @@ function getExpeditionStepMeta(step, lang) {
     return `${dateLabel} · ${typeLabel}`;
 }
 
-function isExpeditionStepPending(step, now = new Date()) {
-    // Not yet started = gray
+function isExpeditionStepPending(step, now = getExpeditionNow()) {
+    return getExpeditionStepState(step, null, now) === 'pending';
+}
+
+/** @returns {'done'|'active'|'pending'} */
+function getExpeditionStepState(step, allSteps = null, now = getExpeditionNow()) {
     const stepStart = new Date(step.date + 'T00:00:00');
-    return now < stepStart;
+    if (now < stepStart) return 'pending';
+
+    const todayIso = toIsoDate(now);
+
+    // Same calendar day: transport/hotel is current; stay waits until the transfer is done
+    if (step.date === todayIso) {
+        if (step.type === 'stay' && allSteps) {
+            const sameDayTransport = allSteps.some(s =>
+                s.date === step.date && (s.type === 'plane' || s.type === 'boat' || s.type === 'ship')
+            );
+            if (sameDayTransport) return 'pending';
+        }
+        if (step.type === 'plane' || step.type === 'boat' || step.type === 'ship' || step.type === 'hotel') {
+            return 'active';
+        }
+        if (step.type === 'stay') return 'active';
+    }
+
+    if (step.end) {
+        const stepEnd = new Date(step.end + 'T23:59:59');
+        if (now <= stepEnd) return 'active';
+        return 'done';
+    }
+
+    return 'done';
 }
 
 function toggleExpedition(expId) {
@@ -2435,24 +2481,39 @@ function toggleExpedition(expId) {
 function renderExpeditions() {
     const list = document.getElementById('expedition-list');
     const title = document.querySelector('.expedition-panel-title');
+    const panel = document.getElementById('expedition-panel');
     if (!list) return;
 
     const lang = currentLanguage;
     const t = translations[lang];
-    const now = new Date();
+    const now = getExpeditionNow();
 
     if (title) title.textContent = t.expeditionsTitle;
+
+    let asOf = panel && panel.querySelector('.expedition-as-of');
+    if (panel && title && !asOf) {
+        asOf = document.createElement('p');
+        asOf.className = 'expedition-as-of';
+        title.insertAdjacentElement('afterend', asOf);
+    }
+    if (asOf) {
+        asOf.textContent = `${t.expeditionAsOf} ${formatExpeditionDate(toIsoDate(now), lang)}`;
+    }
 
     list.innerHTML = EXPEDITIONS_2027.map(exp => {
         const isOpen = !!expeditionOpenState[exp.id];
         const stepsHtml = exp.steps.map(step => {
-            const pending = isExpeditionStepPending(step, now);
+            const state = getExpeditionStepState(step, exp.steps, now);
             const icon = EXPEDITION_ICONS[step.type] || EXPEDITION_ICONS.plane;
+            const stateClass = state === 'pending' ? ' pending' : (state === 'active' ? ' active' : '');
+            const progressBadge = state === 'active'
+                ? `<span class="expedition-step-now">${t.expeditionInProgress}</span>`
+                : '';
             return `
-                <div class="expedition-step${pending ? ' pending' : ''}">
+                <div class="expedition-step${stateClass}">
                     <div class="expedition-step-icon">${icon}</div>
                     <div class="expedition-step-body">
-                        <p class="expedition-step-label">${getExpeditionStepLabel(step, lang)}</p>
+                        <p class="expedition-step-label">${getExpeditionStepLabel(step, lang)}${progressBadge}</p>
                         <p class="expedition-step-meta">${getExpeditionStepMeta(step, lang)}</p>
                     </div>
                 </div>

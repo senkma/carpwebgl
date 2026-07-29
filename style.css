@@ -1310,6 +1310,15 @@ body::after {
     text-shadow: 0 1px 2px rgba(255, 255, 255, 0.7);
 }
 
+.expedition-as-of {
+    margin: -4px 0 10px 4px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.4px;
+    color: #7a6a55;
+}
+
 .expedition-list {
     display: flex;
     flex-direction: column;
@@ -1434,6 +1443,28 @@ body::after {
 
 .expedition-step.pending::before {
     background: rgba(120, 120, 120, 0.35);
+}
+
+.expedition-step.active .expedition-step-icon {
+    background: rgba(201, 169, 97, 0.45);
+    border-color: #c9a961;
+    box-shadow: 0 0 0 3px rgba(201, 169, 97, 0.25);
+    color: #2d2416;
+}
+
+.expedition-step-now {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    vertical-align: middle;
+    color: #5c4a3a;
+    background: rgba(201, 169, 97, 0.35);
+    border: 1px solid rgba(201, 169, 97, 0.55);
 }
 
 .expedition-step-icon {
