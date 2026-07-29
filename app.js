@@ -818,11 +818,16 @@ function setupEventListeners() {
         infoPanel.classList.add('hidden');
         infoPanel.classList.remove('wide');
 
-        // Reset states
+        // Reset states and restore panel DOM for next open
         currentMarker = null;
         currentLocationData = null;
         currentInfoCardData = null;
         currentTab = 'overview';
+        if (infoCardContentTimeout) {
+            clearTimeout(infoCardContentTimeout);
+            infoCardContentTimeout = null;
+        }
+        restoreInfoPanelStructure();
         updateConnectionLine();
     });
 
@@ -1051,12 +1056,53 @@ let currentLocationData = null;
 let currentTab = 'overview';
 const tabOrder = ['overview', 'research', 'facilities'];
 
+// Restore default single-column panel structure (wide info cards replace it)
+let infoCardContentTimeout = null;
+
+function restoreInfoPanelStructure() {
+    if (infoCardContentTimeout) {
+        clearTimeout(infoCardContentTimeout);
+        infoCardContentTimeout = null;
+    }
+
+    const infoPanel = document.getElementById('info-panel');
+    const contentWrapper = infoPanel && infoPanel.querySelector('.info-content-wrapper');
+    if (!infoPanel || !contentWrapper) return null;
+
+    infoPanel.classList.remove('wide');
+    contentWrapper.style.opacity = '1';
+    contentWrapper.style.display = '';
+
+    let content = document.getElementById('info-content');
+    if (!content || !contentWrapper.contains(content) || contentWrapper.children.length !== 1) {
+        contentWrapper.innerHTML = '<div class="info-content" id="info-content"></div>';
+        content = document.getElementById('info-content');
+    }
+
+    return content;
+}
+
+function clearTabButtonHandlers(btn) {
+    if (!btn) return;
+    if (btn._clickHandler) {
+        btn.removeEventListener('click', btn._clickHandler);
+        btn._clickHandler = null;
+    }
+    if (btn._cardClickHandler) {
+        btn.removeEventListener('click', btn._cardClickHandler);
+        btn._cardClickHandler = null;
+    }
+}
+
 // Show location information with side navigation
 function showLocationInfo(location) {
     currentLocationData = location;
+    currentInfoCardData = null;
     currentTab = 'overview';
 
     const panel = document.getElementById('info-panel');
+    const content = restoreInfoPanelStructure();
+    if (!panel || !content) return;
 
     // Setup navigation arrows
     setupTabNavigation();
@@ -1104,7 +1150,14 @@ function setupTabNavigation() {
     const researchBtn = document.getElementById('tab-research');
     const facilitiesBtn = document.getElementById('tab-facilities');
 
+    if (!overviewBtn || !researchBtn || !facilitiesBtn || !currentLocationData) return;
+
     const tabConfigs = getTabConfigs(currentLocationData);
+
+    // Clear both location and info-card handlers to avoid conflicts
+    clearTabButtonHandlers(overviewBtn);
+    clearTabButtonHandlers(researchBtn);
+    clearTabButtonHandlers(facilitiesBtn);
 
     // Update button labels
     if (tabConfigs.length === 1) {
@@ -1122,11 +1175,6 @@ function setupTabNavigation() {
         researchBtn.style.display = 'block';
         facilitiesBtn.style.display = 'block';
     }
-
-    // Add click handlers (use once = true to avoid duplicate listeners)
-    overviewBtn.removeEventListener('click', overviewBtn._clickHandler);
-    researchBtn.removeEventListener('click', researchBtn._clickHandler);
-    facilitiesBtn.removeEventListener('click', facilitiesBtn._clickHandler);
 
     overviewBtn._clickHandler = () => switchToTab('overview');
     researchBtn._clickHandler = () => switchToTab('research');
@@ -1167,21 +1215,26 @@ window.addEventListener('resize', () => {
 
 // Switch to a specific tab
 function switchToTab(tabName) {
+    if (!currentLocationData || currentInfoCardData) return;
     if (tabName === currentTab) return;
 
-    const content = document.getElementById('info-content');
+    const content = document.getElementById('info-content') || restoreInfoPanelStructure();
+    if (!content) return;
 
     // Minimal subtle fade transition
     content.classList.add('fade-out');
 
     setTimeout(() => {
+        if (!currentLocationData || currentInfoCardData) return;
         currentTab = tabName;
         updateTabContent();
-        content.classList.remove('fade-out');
-        content.classList.add('fade-in');
+        const activeContent = document.getElementById('info-content');
+        if (!activeContent) return;
+        activeContent.classList.remove('fade-out');
+        activeContent.classList.add('fade-in');
 
         setTimeout(() => {
-            content.classList.remove('fade-in');
+            activeContent.classList.remove('fade-in');
         }, 200);
     }, 100);
 }
@@ -1193,6 +1246,7 @@ function updateNavigationButtons() {
     const overviewBtn = document.getElementById('tab-overview');
     const researchBtn = document.getElementById('tab-research');
     const facilitiesBtn = document.getElementById('tab-facilities');
+    if (!overviewBtn || !researchBtn || !facilitiesBtn) return;
 
     // Remove active class from all
     overviewBtn.classList.remove('active');
@@ -1213,7 +1267,8 @@ function updateNavigationButtons() {
 function updateTabContent(skipAnimation = false) {
     if (!currentLocationData) return;
 
-    const content = document.getElementById('info-content');
+    const content = document.getElementById('info-content') || restoreInfoPanelStructure();
+    if (!content) return;
 
     // Update navigation buttons
     updateNavigationButtons();
@@ -1317,12 +1372,19 @@ function resetView() {
     const panel = document.getElementById('info-panel');
     if (panel) {
         panel.classList.add('hidden');
+        panel.classList.remove('wide');
     }
 
     // Hide connection line
     currentMarker = null;
     currentLocationData = null;
+    currentInfoCardData = null;
     currentTab = 'overview';
+    if (infoCardContentTimeout) {
+        clearTimeout(infoCardContentTimeout);
+        infoCardContentTimeout = null;
+    }
+    restoreInfoPanelStructure();
     updateConnectionLine();
 
     // Return to default Antarctica view
@@ -2021,14 +2083,19 @@ function setupInfoCardTabs() {
     const overviewBtn = document.getElementById('tab-overview');
     const researchBtn = document.getElementById('tab-research');
     const facilitiesBtn = document.getElementById('tab-facilities');
+    if (!overviewBtn || !researchBtn || !facilitiesBtn) return;
 
     const tabs = currentInfoCardData.tabs;
+
+    // Clear both location and info-card handlers to avoid conflicts
+    clearTabButtonHandlers(overviewBtn);
+    clearTabButtonHandlers(researchBtn);
+    clearTabButtonHandlers(facilitiesBtn);
 
     // Update button labels and visibility based on number of tabs
     if (tabs.length >= 1) {
         overviewBtn.textContent = tabs[0];
         overviewBtn.style.display = 'block';
-        overviewBtn.removeEventListener('click', overviewBtn._cardClickHandler);
         overviewBtn._cardClickHandler = () => switchToInfoCardTab(0);
         overviewBtn.addEventListener('click', overviewBtn._cardClickHandler);
     }
@@ -2036,7 +2103,6 @@ function setupInfoCardTabs() {
     if (tabs.length >= 2) {
         researchBtn.textContent = tabs[1];
         researchBtn.style.display = 'block';
-        researchBtn.removeEventListener('click', researchBtn._cardClickHandler);
         researchBtn._cardClickHandler = () => switchToInfoCardTab(1);
         researchBtn.addEventListener('click', researchBtn._cardClickHandler);
     } else {
@@ -2046,15 +2112,11 @@ function setupInfoCardTabs() {
     if (tabs.length >= 3) {
         facilitiesBtn.textContent = tabs[2];
         facilitiesBtn.style.display = 'block';
-        facilitiesBtn.removeEventListener('click', facilitiesBtn._cardClickHandler);
         facilitiesBtn._cardClickHandler = () => switchToInfoCardTab(2);
         facilitiesBtn.addEventListener('click', facilitiesBtn._cardClickHandler);
     } else {
         facilitiesBtn.style.display = 'none';
     }
-
-    // For cards with more than 3 tabs, we'll need to add extra buttons
-    // For now, we'll handle up to 3 tabs with existing buttons
 
     // Update button positions
     setTimeout(() => {
@@ -2066,6 +2128,7 @@ function setupInfoCardTabs() {
 }
 
 function switchToInfoCardTab(tabIndex) {
+    if (!currentInfoCardData || currentLocationData) return;
     currentTab = ['overview', 'research', 'facilities'][tabIndex]; // Keep using same tab names
     updateInfoCardNavigationButtons();
     updateInfoCardTabContent();
@@ -2075,6 +2138,7 @@ function updateInfoCardNavigationButtons() {
     const overviewBtn = document.getElementById('tab-overview');
     const researchBtn = document.getElementById('tab-research');
     const facilitiesBtn = document.getElementById('tab-facilities');
+    if (!overviewBtn || !researchBtn || !facilitiesBtn) return;
 
     overviewBtn.classList.remove('active');
     researchBtn.classList.remove('active');
@@ -2093,12 +2157,18 @@ function updateInfoCardTabContent() {
     if (!currentInfoCardData) return;
 
     const infoPanel = document.getElementById('info-panel');
+    if (!infoPanel) return;
     const contentWrapper = infoPanel.querySelector('.info-content-wrapper');
     const tabs = currentInfoCardData.tabs;
     const tabIndex = ['overview', 'research', 'facilities'].indexOf(currentTab);
     const tabName = tabs[tabIndex];
 
     if (!tabName || !currentInfoCardData.content[tabName]) return;
+
+    if (infoCardContentTimeout) {
+        clearTimeout(infoCardContentTimeout);
+        infoCardContentTimeout = null;
+    }
 
     // For wide panel, create two-column layout
     if (infoPanel.classList.contains('wide')) {
@@ -2107,7 +2177,10 @@ function updateInfoCardTabContent() {
             contentWrapper.style.opacity = '0.3';
         }
 
-        setTimeout(() => {
+        infoCardContentTimeout = setTimeout(() => {
+            infoCardContentTimeout = null;
+            if (!currentInfoCardData) return;
+
             // Get secondary content if available
             const secondaryContent = currentInfoCardData.secondaryContent && currentInfoCardData.secondaryContent[tabName]
                 ? currentInfoCardData.secondaryContent[tabName]
@@ -2142,14 +2215,17 @@ function updateInfoCardTabContent() {
         }, 200);
     } else {
         // Normal single column for stations
-        const content = document.getElementById('info-content');
+        const content = document.getElementById('info-content') || restoreInfoPanelStructure();
         if (!content) return;
 
         content.style.opacity = '0.3';
 
-        setTimeout(() => {
-            content.innerHTML = currentInfoCardData.content[tabName];
-            content.style.opacity = '1';
+        infoCardContentTimeout = setTimeout(() => {
+            infoCardContentTimeout = null;
+            const activeContent = document.getElementById('info-content');
+            if (!activeContent || !currentInfoCardData) return;
+            activeContent.innerHTML = currentInfoCardData.content[tabName];
+            activeContent.style.opacity = '1';
         }, 200);
     }
 }
