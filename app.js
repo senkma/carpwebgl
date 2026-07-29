@@ -878,6 +878,15 @@ let previousMousePosition = { x: 0, y: 0 };
 let rotationVelocity = { x: 0, y: 0 };
 let touchStartPosition = { x: 0, y: 0 };
 
+/** Slower drag when zoomed in so the globe doesn't spin too fast */
+function getGlobeDragSensitivity() {
+    const z = camera ? camera.position.z : 10;
+    const refZoom = 10;
+    // Clamp so extreme zoom stays usable
+    const factor = Math.max(0.25, Math.min(1.2, z / refZoom));
+    return 0.003 * factor;
+}
+
 function onMouseMove(event) {
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -887,9 +896,10 @@ function onMouseMove(event) {
             x: event.clientX - previousMousePosition.x,
             y: event.clientY - previousMousePosition.y
         };
+        const sensitivity = getGlobeDragSensitivity();
 
-        rotationVelocity.x = deltaMove.y * 0.003;
-        rotationVelocity.y = deltaMove.x * 0.003;
+        rotationVelocity.x = deltaMove.y * sensitivity;
+        rotationVelocity.y = deltaMove.x * sensitivity;
 
         previousMousePosition = {
             x: event.clientX,
@@ -935,9 +945,10 @@ function onTouchMove(event) {
             x: event.touches[0].clientX - previousMousePosition.x,
             y: event.touches[0].clientY - previousMousePosition.y
         };
+        const sensitivity = getGlobeDragSensitivity();
 
-        rotationVelocity.x = deltaMove.y * 0.003;
-        rotationVelocity.y = deltaMove.x * 0.003;
+        rotationVelocity.x = deltaMove.y * sensitivity;
+        rotationVelocity.y = deltaMove.x * sensitivity;
 
         previousMousePosition = {
             x: event.touches[0].clientX,
