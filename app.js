@@ -201,7 +201,7 @@ const locations = {
 
 // Initialize the application
 function init() {
-    updateLoadingProgress(10, 'Creating 3D scene...');
+    updateLoadingProgress(10, 'Preparing scene…');
 
     // Scene setup with no fog (transparent background)
     scene = new THREE.Scene();
@@ -221,32 +221,28 @@ function init() {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setClearColor(0x000000, 0); // Transparent background
 
-    updateLoadingProgress(30, 'Building planet Earth...');
+    updateLoadingProgress(30, 'Building globe…');
 
     // Create globe
     createGlobe();
 
-    updateLoadingProgress(50, 'Adding atmosphere...');
+    updateLoadingProgress(55, 'Adding atmosphere…');
 
     // Create atmosphere
     createAtmosphere();
 
-    updateLoadingProgress(60, 'Placing location markers...');
+    updateLoadingProgress(70, 'Placing stations…');
 
     // Create location markers
     createMarkers();
 
-    updateLoadingProgress(70, 'Preparing vintage atmosphere...');
+    updateLoadingProgress(85, 'Almost ready…');
 
     // Stars removed for vintage look
     // createStars();
 
-    updateLoadingProgress(80, 'Setting up lights...');
-
     // Lighting
     createLights();
-
-    updateLoadingProgress(90, 'Initializing controls...');
 
     // Raycaster for mouse interaction
     raycaster = new THREE.Raycaster();
@@ -261,13 +257,18 @@ function init() {
     // Connection lines removed for cleaner look
     // connectionLines = new ConnectionLines(scene, locations, globe);
 
-    updateLoadingProgress(100, 'Launch sequence complete!');
+    updateLoadingProgress(100, 'Ready');
 
     // Hide loading screen
     setTimeout(() => {
-        document.getElementById('loading-screen').classList.add('hidden');
+        const loadingScreen = document.getElementById('loading-screen');
+        if (!loadingScreen) return;
+        loadingScreen.classList.add('hidden');
         animate();
-    }, 500);
+        setTimeout(() => {
+            loadingScreen.remove();
+        }, 700);
+    }, 400);
 }
 
 // Create the main globe with real NASA texture
@@ -281,7 +282,7 @@ function createGlobe() {
     const earthTexture = textureLoader.load(
         'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg',
         function(texture) {
-            updateLoadingProgress(45, 'Earth texture loaded...');
+            updateLoadingProgress(50, 'Globe texture ready…');
         },
         undefined,
         function(error) {
