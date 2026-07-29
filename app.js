@@ -13,6 +13,9 @@ let particleSystem = null;
 let connectionLines = null;
 let autoRotateEnabled = true;
 let currentLanguage = 'en';
+let expeditionRouteGroup = null;
+let expeditionTravelers = [];
+let expeditionArcMeshes = [];
 
 // Translations
 const translations = {
@@ -232,6 +235,9 @@ function init() {
     // Create location markers
     createMarkers();
 
+    // Expedition routes (arcs + travelers) — uses simulated expedition date
+    createExpeditionRoutes();
+
     // Lighting
     createLights();
 
@@ -251,6 +257,8 @@ function revealGlobe() {
     if (canvas) canvas.classList.remove('globe-pending');
     const weatherPins = document.getElementById('weather-pins');
     if (weatherPins) weatherPins.classList.remove('globe-pending');
+    const travelers = document.getElementById('expedition-travelers');
+    if (travelers) travelers.classList.remove('globe-pending');
 }
 
 // Create the main globe with real NASA texture
@@ -690,58 +698,66 @@ function createMarkers() {
 }
 
 function createMarker(lat, lon, icon) {
-    const group = new THREE.Group();
-
-    // Convert lat/lon to 3D position
+    const group = createMapPinMarker(0xc9a961, 1.65);
     const phi = (90 - lat) * (Math.PI / 180);
     const theta = (lon + 180) * (Math.PI / 180);
     const radius = 2.05;
 
-    const x = -(radius * Math.sin(phi) * Math.cos(theta));
-    const y = radius * Math.cos(phi);
-    const z = radius * Math.sin(phi) * Math.sin(theta);
-
-    group.position.set(x, y, z);
-
-    // Simple glowing dot
-    const dotGeometry = new THREE.SphereGeometry(0.014, 16, 16);
-    const dotMaterial = new THREE.MeshBasicMaterial({
-        color: 0xc9a961,  // Compass gold
-        transparent: true,
-        opacity: 0.95
-    });
-    const dot = new THREE.Mesh(dotGeometry, dotMaterial);
-
-    // Outer glow ring
-    const glowGeometry = new THREE.SphereGeometry(0.022, 16, 16);
-    const glowMaterial = new THREE.MeshBasicMaterial({
-        color: 0xc9a961,
-        transparent: true,
-        opacity: 0.28
-    });
-    const glow = new THREE.Mesh(glowGeometry, glowMaterial);
-
-    // Pulsing ring
-    const ringGeometry = new THREE.RingGeometry(0.026, 0.032, 32);
-    const ringMaterial = new THREE.MeshBasicMaterial({
-        color: 0xc9a961,
-        transparent: true,
-        opacity: 0.45,
-        side: THREE.DoubleSide
-    });
-    const ring = new THREE.Mesh(ringGeometry, ringMaterial);
-    ring.rotation.x = -Math.PI / 2;
-
-    group.add(dot);
-    group.add(glow);
-    group.add(ring);
-
-    // Point marker to look at globe center
+    group.position.set(
+        -(radius * Math.sin(phi) * Math.cos(theta)),
+        radius * Math.cos(phi),
+        radius * Math.sin(phi) * Math.sin(theta)
+    );
     group.lookAt(0, 0, 0);
-
-    // Animation data
     group.userData.time = Math.random() * Math.PI * 2;
+    group.userData.isStationMarker = true;
+    return group;
+}
 
+/** Classic teardrop map pin standing on the globe surface */
+function createMapPinMarker(color, scale = 1) {
+    const group = new THREE.Group();
+
+    const bodyMat = new THREE.MeshBasicMaterial({
+        color,
+        transparent: true,
+        opacity: 0.98
+    });
+    const headMat = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.98
+    });
+    const jewelMat = new THREE.MeshBasicMaterial({
+        color,
+        transparent: true,
+        opacity: 0.98
+    });
+
+    // Tip points toward -Z (into the globe after lookAt)
+    const tip = new THREE.Mesh(
+        new THREE.ConeGeometry(0.02 * scale, 0.048 * scale, 12),
+        bodyMat
+    );
+    tip.rotation.x = Math.PI;
+    tip.position.z = 0.024 * scale;
+
+    const head = new THREE.Mesh(
+        new THREE.SphereGeometry(0.015 * scale, 14, 14),
+        headMat
+    );
+    head.position.z = 0.052 * scale;
+
+    // Small colored center dot on the pin head
+    const jewel = new THREE.Mesh(
+        new THREE.SphereGeometry(0.006 * scale, 10, 10),
+        jewelMat
+    );
+    jewel.position.z = 0.066 * scale;
+
+    group.add(tip);
+    group.add(head);
+    group.add(jewel);
     return group;
 }
 
@@ -1494,29 +1510,28 @@ function animate() {
     //     particleSystem.update(time);
     // }
 
-    // Animate markers (subtle pulsing effect)
+    // Keep station pin markers roughly constant on screen while zooming
+    const zoomScale = camera.position.z / 10;
     markers.forEach(marker => {
-        const ring = marker.children[2]; // Ring
-        const glow = marker.children[1]; // Outer glow
-        const dot = marker.children[0];  // Center dot
-
-        if (ring) {
-            const pulse = Math.sin(time * 1.5 + marker.userData.time) * 0.5 + 0.5;
-            ring.scale.set(1 + pulse * 0.2, 1 + pulse * 0.2, 1);
-            ring.material.opacity = 0.3 + pulse * 0.3;
-        }
-        if (glow) {
-            const glowPulse = Math.sin(time * 2 + marker.userData.time) * 0.5 + 0.5;
-            glow.scale.set(1 + glowPulse * 0.3, 1 + glowPulse * 0.3, 1 + glowPulse * 0.3);
-            glow.material.opacity = 0.2 + glowPulse * 0.2;
-        }
+        const pulse = Math.sin(time * 1.8 + marker.userData.time) * 0.5 + 0.5;
+        marker.scale.setScalar(zoomScale * (1 + pulse * 0.04));
     });
+    if (expeditionRouteGroup) {
+        expeditionRouteGroup.children.forEach(child => {
+            if (child.userData && child.userData.isWaypoint) {
+                child.scale.setScalar(zoomScale * 0.95);
+            }
+        });
+    }
 
     // Update connection line
     updateConnectionLine();
 
     // Keep weather pin glued to Mendel marker
     updateWeatherPinPosition();
+
+    // Expedition route arcs + traveler icons
+    updateExpeditionRoutes();
 
     renderer.render(scene, camera);
 }
@@ -2366,6 +2381,10 @@ const EXPEDITIONS_2027 = [
 
 function setupExpeditions() {
     renderExpeditions();
+    // Routes are created in init(); rebuild travelers container if needed
+    if (globe && !expeditionRouteGroup) {
+        createExpeditionRoutes();
+    }
 }
 
 const expeditionOpenState = {
@@ -2376,6 +2395,24 @@ const expeditionOpenState = {
 // Demo timeline: ~2 Feb 2027 — Mendel boat to station, Nelson Madrid→Santiago (Atlantic)
 const EXPEDITION_SIMULATED_NOW = new Date('2027-02-02T14:00:00');
 
+const EXPEDITION_PLACE_COORDS = {
+    'Vienna': { lat: 48.21, lon: 16.37 },
+    'Madrid': { lat: 40.42, lon: -3.70 },
+    'Buenos Aires': { lat: -34.60, lon: -58.38 },
+    'Ushuaia': { lat: -54.80, lon: -68.30 },
+    'Marambio': { lat: -64.24, lon: -56.63 },
+    'J.G. Mendel': { lat: -63.80, lon: -57.90 },
+    'Santiago (SCL)': { lat: -33.45, lon: -70.67 },
+    'Santiago': { lat: -33.45, lon: -70.67 },
+    'Punta Arenas': { lat: -53.16, lon: -70.91 },
+    'Nelson Island': { lat: -62.30, lon: -59.00 }
+};
+
+const EXPEDITION_ROUTE_COLORS = {
+    mendel: 0xffd978,
+    nelson: 0xffb060
+};
+
 function getExpeditionNow() {
     return EXPEDITION_SIMULATED_NOW;
 }
@@ -2385,6 +2422,239 @@ function toIsoDate(date) {
     const m = String(date.getMonth() + 1).padStart(2, '0');
     const d = String(date.getDate()).padStart(2, '0');
     return `${y}-${m}-${d}`;
+}
+
+function latLonToVector3(lat, lon, radius = 2.02) {
+    const phi = (90 - lat) * (Math.PI / 180);
+    const theta = (lon + 180) * (Math.PI / 180);
+    const x = -(radius * Math.sin(phi) * Math.cos(theta));
+    const y = radius * Math.cos(phi);
+    const z = radius * Math.sin(phi) * Math.sin(theta);
+    return new THREE.Vector3(x, y, z);
+}
+
+function slerpUnitVectors(a, b, t) {
+    const angle = a.angleTo(b);
+    if (angle < 1e-5) return a.clone();
+    const sin = Math.sin(angle);
+    return a.clone().multiplyScalar(Math.sin((1 - t) * angle) / sin)
+        .add(b.clone().multiplyScalar(Math.sin(t * angle) / sin));
+}
+
+function getRouteArcLift(startUnit, endUnit) {
+    const angle = startUnit.angleTo(endUnit);
+    // Keep arcs close to the globe surface
+    return Math.min(0.16, 0.025 + angle * 0.1);
+}
+
+function buildRouteArcPoints(lat1, lon1, lat2, lon2, segments = 80) {
+    const start = latLonToVector3(lat1, lon1, 1);
+    const end = latLonToVector3(lat2, lon2, 1);
+    const lift = getRouteArcLift(start, end);
+    const points = [];
+    for (let i = 0; i <= segments; i++) {
+        const t = i / segments;
+        const p = slerpUnitVectors(start, end, t);
+        const r = 2.02 + Math.sin(t * Math.PI) * lift;
+        points.push(p.multiplyScalar(r));
+    }
+    return points;
+}
+
+function pointOnRouteArc(lat1, lon1, lat2, lon2, t) {
+    const start = latLonToVector3(lat1, lon1, 1);
+    const end = latLonToVector3(lat2, lon2, 1);
+    const lift = getRouteArcLift(start, end);
+    const p = slerpUnitVectors(start, end, t);
+    return p.multiplyScalar(2.02 + Math.sin(t * Math.PI) * lift);
+}
+
+function createRouteArcMesh(points, color, state) {
+    // Use dashed Lines (screen-space ~1px) so zoom does not fatten the route
+    const group = new THREE.Group();
+    const opacity = state === 'active' ? 1 : (state === 'done' ? 0.85 : 0.45);
+    const dashSize = state === 'pending' ? 0.06 : 0.09;
+    const gapSize = state === 'pending' ? 0.07 : 0.045;
+
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+    // Dark underlay for contrast
+    const outline = new THREE.Line(
+        geometry,
+        new THREE.LineDashedMaterial({
+            color: 0x000000,
+            transparent: true,
+            opacity: opacity * 0.55,
+            dashSize,
+            gapSize,
+            depthWrite: false
+        })
+    );
+    outline.computeLineDistances();
+    group.add(outline);
+
+    // Bright dashed route
+    const line = new THREE.Line(
+        geometry.clone(),
+        new THREE.LineDashedMaterial({
+            color,
+            transparent: true,
+            opacity,
+            dashSize,
+            gapSize,
+            depthWrite: false
+        })
+    );
+    line.computeLineDistances();
+    group.add(line);
+
+    // Second pass slightly brighter for active routes
+    if (state === 'active') {
+        const glow = new THREE.Line(
+            geometry.clone(),
+            new THREE.LineDashedMaterial({
+                color: 0xffffff,
+                transparent: true,
+                opacity: 0.35,
+                dashSize: dashSize * 0.7,
+                gapSize: gapSize * 1.15,
+                depthWrite: false
+            })
+        );
+        glow.computeLineDistances();
+        group.add(glow);
+    }
+
+    group.userData = { state, baseOpacity: opacity, color };
+    return group;
+}
+
+function createRouteWaypoint(lat, lon, color, state) {
+    const scale = state === 'active' ? 1.25 : 1.05;
+    const pinColor = state === 'pending' ? 0x8a7a66 : color;
+    const group = createMapPinMarker(pinColor, scale);
+    group.position.copy(latLonToVector3(lat, lon, 2.04));
+    group.lookAt(0, 0, 0);
+    group.userData.isWaypoint = true;
+    if (state === 'pending') {
+        group.traverse(obj => {
+            if (obj.material) {
+                obj.material.transparent = true;
+                obj.material.opacity = 0.4;
+            }
+        });
+    }
+    return group;
+}
+
+function createExpeditionRoutes() {
+    if (!globe) return;
+
+    // Clear previous
+    if (expeditionRouteGroup) {
+        globe.remove(expeditionRouteGroup);
+        expeditionRouteGroup.traverse(obj => {
+            if (obj.geometry) obj.geometry.dispose();
+            if (obj.material) obj.material.dispose();
+        });
+    }
+    expeditionArcMeshes = [];
+    expeditionTravelers = [];
+
+    const container = document.getElementById('expedition-travelers');
+    if (container) container.innerHTML = '';
+
+    expeditionRouteGroup = new THREE.Group();
+    expeditionRouteGroup.name = 'expedition-routes';
+    globe.add(expeditionRouteGroup);
+
+    const now = getExpeditionNow();
+    const seenWaypoints = new Set();
+
+    EXPEDITIONS_2027.forEach(exp => {
+        const color = EXPEDITION_ROUTE_COLORS[exp.id] || 0xc9a961;
+        const transportSteps = exp.steps.filter(s =>
+            s.type === 'plane' || s.type === 'boat' || s.type === 'ship'
+        );
+
+        transportSteps.forEach(step => {
+            const fromName = step.from && step.from.en;
+            const toName = step.to && step.to.en;
+            const from = EXPEDITION_PLACE_COORDS[fromName];
+            const to = EXPEDITION_PLACE_COORDS[toName];
+            if (!from || !to) return;
+
+            const state = getExpeditionStepState(step, exp.steps, now);
+            const points = buildRouteArcPoints(from.lat, from.lon, to.lat, to.lon);
+            const arc = createRouteArcMesh(points, color, state);
+            arc.userData.expId = exp.id;
+            expeditionRouteGroup.add(arc);
+            expeditionArcMeshes.push(arc);
+
+            // Waypoints
+            [[fromName, from], [toName, to]].forEach(([name, coords]) => {
+                const key = `${exp.id}:${name}`;
+                if (seenWaypoints.has(key)) return;
+                seenWaypoints.add(key);
+                const wpState = state === 'pending' ? 'pending' : (state === 'active' ? 'active' : 'done');
+                expeditionRouteGroup.add(createRouteWaypoint(coords.lat, coords.lon, color, wpState));
+            });
+
+            if (state === 'active' && container) {
+                const el = document.createElement('div');
+                el.className = `expedition-traveler type-${step.type}`;
+                el.dataset.exp = exp.id;
+                el.innerHTML = `
+                    <span class="expedition-traveler-icon">${EXPEDITION_ICONS[step.type] || EXPEDITION_ICONS.plane}</span>
+                    <span class="expedition-traveler-name">${exp.id === 'mendel' ? 'Mendel' : 'Nelson'}</span>
+                `;
+                container.appendChild(el);
+
+                expeditionTravelers.push({
+                    el,
+                    expId: exp.id,
+                    type: step.type,
+                    from,
+                    to
+                });
+            }
+        });
+    });
+}
+
+function updateExpeditionRoutes() {
+    if (!camera || !globe || !expeditionTravelers.length) return;
+
+    const cameraDir = camera.position.clone().normalize();
+
+    expeditionTravelers.forEach(traveler => {
+        // Static icon at the midpoint of the active segment
+        const localPos = pointOnRouteArc(
+            traveler.from.lat, traveler.from.lon,
+            traveler.to.lat, traveler.to.lon,
+            0.5
+        );
+
+        const worldPos = localPos.clone();
+        globe.localToWorld(worldPos);
+
+        const facing = worldPos.clone().normalize().dot(cameraDir);
+        const screenPos = worldPos.clone().project(camera);
+        const onScreen = screenPos.x > -1.2 && screenPos.x < 1.2
+            && screenPos.y > -1.2 && screenPos.y < 1.2
+            && screenPos.z < 1;
+
+        if (facing < 0.08 || !onScreen) {
+            traveler.el.classList.add('hidden');
+            return;
+        }
+
+        const x = (screenPos.x * 0.5 + 0.5) * window.innerWidth;
+        const y = (screenPos.y * -0.5 + 0.5) * window.innerHeight;
+        traveler.el.style.left = `${x}px`;
+        traveler.el.style.top = `${y}px`;
+        traveler.el.classList.remove('hidden');
+    });
 }
 
 function formatExpeditionDate(iso, lang) {
