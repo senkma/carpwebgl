@@ -1337,15 +1337,17 @@ body::after {
     }
 }
 
-/* Right sidebar - expeditions above university */
+/* Right sidebar - expeditions at top, university centered in remaining space */
 .right-sidebar {
     position: fixed;
-    top: 50%;
+    top: 90px;
     right: 40px;
-    transform: translateY(-50%);
+    bottom: 100px;
+    transform: none;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    justify-content: flex-start;
+    gap: 0;
     z-index: 110;
     width: 260px;
     animation: fadeInRight 1s ease-out 2s both;
@@ -1359,11 +1361,11 @@ body::after {
 @keyframes fadeInRight {
     from {
         opacity: 0;
-        transform: translateY(-50%) translateX(30px);
+        transform: translateX(30px);
     }
     to {
         opacity: 1;
-        transform: translateY(-50%) translateX(0);
+        transform: translateX(0);
     }
 }
 
@@ -1374,8 +1376,9 @@ body::after {
     border-radius: 0;
     padding: 0;
     box-shadow: none;
-    max-height: min(460px, 52vh);
+    max-height: min(320px, 38vh);
     overflow-y: auto;
+    flex-shrink: 0;
 }
 
 .expedition-panel-title {
@@ -1563,7 +1566,7 @@ body::after {
     opacity: 0.85;
 }
 
-/* University Card - inside right sidebar */
+/* University Card - centered in space below expeditions (no overlap) */
 .university-card {
     position: relative;
     top: auto;
@@ -1579,9 +1582,14 @@ body::after {
         0 4px 16px rgba(92, 74, 58, 0.08),
         inset 0 1px 0 rgba(255, 255, 255, 0.5);
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: auto;
     animation: none;
+    flex-shrink: 0;
+    margin-top: auto;
+    margin-bottom: auto;
 }
 
 .university-card:hover {
@@ -1764,11 +1772,24 @@ body::after {
     .right-sidebar {
         right: 16px;
         width: 200px;
-        gap: 10px;
+        top: 90px;
+        bottom: 90px;
+    }
+
+    .university-card {
+        position: relative;
+        top: auto;
+        right: auto;
+        width: 100%;
+        transform: none;
+    }
+
+    .university-card:hover {
+        transform: translateY(-4px);
     }
 
     .expedition-panel {
-        max-height: min(280px, 40vh);
+        max-height: min(240px, 32vh);
         padding: 0;
     }
 
@@ -1955,17 +1976,30 @@ body::after {
     }
 
     .right-sidebar {
-        top: auto;
+        top: 80px;
         bottom: 70px;
         right: 12px;
         transform: none;
         width: 150px;
         animation: none;
-        max-height: 40vh;
+        max-height: none;
+        justify-content: flex-start;
+    }
+
+    .university-card {
+        position: relative;
+        top: auto;
+        right: auto;
+        width: 100%;
+        transform: none;
+    }
+
+    .university-card:hover {
+        transform: translateY(-4px);
     }
 
     .expedition-panel {
-        max-height: 180px;
+        max-height: 140px;
         padding: 0;
     }
 
@@ -2088,9 +2122,18 @@ body::after {
     }
 
     .right-sidebar {
+        top: 70px;
         bottom: 62px;
         right: 8px;
         width: 120px;
+    }
+
+    .university-card {
+        position: relative;
+        top: auto;
+        right: auto;
+        width: 100%;
+        transform: none;
     }
 
     .expedition-panel {
