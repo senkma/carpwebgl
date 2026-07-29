@@ -1271,20 +1271,24 @@ body::after {
 }
 
 .card-title {
-    font-family: 'Georgia', serif;
+    font-family: 'Rajdhani', sans-serif;
     font-size: 15px;
-    font-weight: bold;
-    color: var(--ink-black);
-    margin: 0 0 5px 0;
-    letter-spacing: 0.5px;
+    font-weight: 600;
+    color: #2d2416;
+    margin: 0 0 4px 0;
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
 .card-location {
-    font-family: 'Georgia', serif;
-    font-size: 11px;
-    color: var(--ink-brown);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: #6b5244;
     margin: 0;
-    font-style: italic;
+    font-style: normal;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
 }
 
 /* Hide location cards when info panel is open — only on smaller screens */
@@ -1629,20 +1633,24 @@ body::after {
 }
 
 .university-card .card-title {
-    font-family: 'Georgia', serif;
+    font-family: 'Rajdhani', sans-serif;
     font-size: 15px;
-    font-weight: bold;
-    color: var(--ink-black);
-    margin: 0 0 5px 0;
-    letter-spacing: 0.5px;
+    font-weight: 600;
+    color: #2d2416;
+    margin: 0 0 4px 0;
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
 .university-card .card-location {
-    font-family: 'Georgia', serif;
-    font-size: 11px;
-    color: var(--ink-brown);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: #6b5244;
     margin: 0;
-    font-style: italic;
+    font-style: normal;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
 }
 
 /* Scrollbar Styling - Modern */
