@@ -110,11 +110,14 @@ body::after {
     align-items: center;
     gap: 4px;
     transition: opacity 0.2s ease;
+    pointer-events: auto;
+    cursor: pointer;
 }
 
 .expedition-traveler.hidden {
     opacity: 0;
     visibility: hidden;
+    pointer-events: none;
 }
 
 .expedition-traveler-icon {
@@ -1418,6 +1421,15 @@ body::after {
     display: flex;
     flex-direction: column;
     min-height: 0;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.expedition-card.is-linked {
+    border-color: rgba(201, 169, 97, 0.95);
+    box-shadow:
+        0 0 0 2px rgba(201, 169, 97, 0.35),
+        0 2px 8px rgba(92, 74, 58, 0.12),
+        0 4px 16px rgba(92, 74, 58, 0.08);
 }
 
 .expedition-card.is-open {

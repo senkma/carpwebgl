@@ -856,6 +856,7 @@ function setupEventListeners() {
 
         // Reset states and restore panel DOM for next open
         currentMarker = null;
+        clearExpeditionConnection();
         currentLocationData = null;
         currentInfoCardData = null;
         currentTab = 'overview';
@@ -1055,17 +1056,176 @@ function flyToLocation(locationKey) {
     isAnimating = true;
 
     // Set current marker for connection line
+    clearExpeditionConnection();
     const markerIndex = Object.keys(locations).indexOf(locationKey);
     currentMarker = markers[markerIndex];
 }
 
 // Update connection line
 let currentMarker = null;
+let currentExpeditionId = null;
+
+function clearExpeditionConnection() {
+    currentExpeditionId = null;
+    document.querySelectorAll('.expedition-card.is-linked').forEach(card => {
+        card.classList.remove('is-linked');
+    });
+}
+
+function setExpeditionCardOpen(expId, isOpen) {
+    expeditionOpenState[expId] = !!isOpen;
+    const card = document.querySelector(`.expedition-card[data-expedition="${expId}"]`);
+    if (!card) return;
+
+    card.classList.toggle('is-open', isOpen);
+    const btn = card.querySelector('.expedition-card-toggle');
+    const body = card.querySelector('.expedition-card-body');
+    if (btn) btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    if (body) body.hidden = !isOpen;
+}
+
+function centerGlobeOnCoords(lat, lon, zoom = 5) {
+    const latRad = lat * Math.PI / 180;
+    const lonRad = lon * Math.PI / 180;
+
+    targetPosition = {
+        y: -(lonRad + Math.PI) + Math.PI / 2,
+        x: latRad
+    };
+    targetZoom = zoom;
+    animationProgress = 0;
+    isAnimating = true;
+    autoRotateEnabled = false;
+}
+
+function getExpeditionFocusCoords(expId) {
+    const traveler = expeditionTravelers.find(t => t.expId === expId);
+    if (traveler) {
+        return {
+            lat: (traveler.from.lat + traveler.to.lat) / 2,
+            lon: (traveler.from.lon + traveler.to.lon) / 2
+        };
+    }
+    const location = locations[expId];
+    if (location) return location.coords;
+    return null;
+}
+
+function deselectExpeditionGroup() {
+    const expId = currentExpeditionId;
+    clearExpeditionConnection();
+    if (expId) setExpeditionCardOpen(expId, false);
+    updateConnectionLine();
+}
+
+function selectExpeditionGroup(expId) {
+    if (!expId) return;
+
+    // Second click on the same group → hide line & collapse card
+    if (currentExpeditionId === expId) {
+        deselectExpeditionGroup();
+        return;
+    }
+
+    // Disconnect station/info panel link
+    currentMarker = null;
+    const infoPanel = document.getElementById('info-panel');
+    if (infoPanel) {
+        infoPanel.classList.add('hidden');
+        infoPanel.classList.remove('wide');
+    }
+    currentLocationData = null;
+    currentInfoCardData = null;
+
+    // Collapse any previously open expedition
+    Object.keys(expeditionOpenState).forEach(id => {
+        if (id !== expId) setExpeditionCardOpen(id, false);
+    });
+
+    currentExpeditionId = expId;
+    setExpeditionCardOpen(expId, true);
+
+    document.querySelectorAll('.expedition-card').forEach(card => {
+        card.classList.toggle('is-linked', card.dataset.expedition === expId);
+    });
+
+    const coords = getExpeditionFocusCoords(expId);
+    if (coords) centerGlobeOnCoords(coords.lat, coords.lon, 5);
+
+    updateConnectionLine();
+}
+
+function getExpeditionGlobeScreenPos(expId) {
+    // Prefer the live traveler badge on the globe
+    const traveler = expeditionTravelers.find(t => t.expId === expId);
+    if (traveler && traveler.el && !traveler.el.classList.contains('hidden')) {
+        const rect = traveler.el.getBoundingClientRect();
+        return {
+            x: rect.left + rect.width / 2,
+            y: rect.top + rect.height / 2
+        };
+    }
+
+    // Fallback: project the station marker / route midpoint
+    if (traveler && camera && globe) {
+        const localPos = pointOnRouteArc(
+            traveler.from.lat, traveler.from.lon,
+            traveler.to.lat, traveler.to.lon,
+            0.5
+        );
+        const worldPos = localPos.clone();
+        globe.localToWorld(worldPos);
+        const screenPos = worldPos.project(camera);
+        if (screenPos.z < 1) {
+            return {
+                x: (screenPos.x * 0.5 + 0.5) * window.innerWidth,
+                y: (screenPos.y * -0.5 + 0.5) * window.innerHeight
+            };
+        }
+    }
+
+    const markerIndex = Object.keys(locations).indexOf(expId);
+    if (markerIndex >= 0 && markers[markerIndex] && camera) {
+        const markerWorldPos = new THREE.Vector3();
+        markers[markerIndex].getWorldPosition(markerWorldPos);
+        const screenPos = markerWorldPos.project(camera);
+        if (screenPos.z < 1) {
+            return {
+                x: (screenPos.x * 0.5 + 0.5) * window.innerWidth,
+                y: (screenPos.y * -0.5 + 0.5) * window.innerHeight
+            };
+        }
+    }
+
+    return null;
+}
 
 function updateConnectionLine() {
     const pathElement = document.getElementById('connection-path');
 
     if (!pathElement) {
+        return;
+    }
+
+    // Expedition group ↔ right-side card
+    if (currentExpeditionId) {
+        const card = document.querySelector(`.expedition-card[data-expedition="${currentExpeditionId}"]`);
+        const from = getExpeditionGlobeScreenPos(currentExpeditionId);
+        if (!card || !from) {
+            pathElement.setAttribute('opacity', '0');
+            return;
+        }
+
+        const cardRect = card.getBoundingClientRect();
+        const toX = cardRect.left + 8;
+        const toY = cardRect.top + Math.min(28, cardRect.height / 2);
+
+        const controlX = (from.x + toX) / 2;
+        const controlY = Math.min(from.y, toY) - 40;
+        const path = `M ${from.x} ${from.y} Q ${controlX} ${controlY}, ${toX} ${toY}`;
+
+        pathElement.setAttribute('d', path);
+        pathElement.setAttribute('opacity', '1');
         return;
     }
 
@@ -1424,6 +1584,7 @@ function resetView() {
 
     // Hide connection line
     currentMarker = null;
+    clearExpeditionConnection();
     currentLocationData = null;
     currentInfoCardData = null;
     currentTab = 'overview';
@@ -2638,10 +2799,23 @@ function createExpeditionRoutes() {
                 const el = document.createElement('div');
                 el.className = `expedition-traveler type-${step.type}`;
                 el.dataset.exp = exp.id;
+                el.setAttribute('role', 'button');
+                el.setAttribute('tabindex', '0');
+                el.setAttribute('aria-label', t[exp.nameKey] || exp.id);
                 el.innerHTML = `
                     <span class="expedition-traveler-icon">${EXPEDITION_ICONS[step.type] || EXPEDITION_ICONS.plane}</span>
                     <span class="expedition-traveler-name">${t[exp.nameKey] || exp.id}</span>
                 `;
+                el.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    selectExpeditionGroup(exp.id);
+                });
+                el.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        selectExpeditionGroup(exp.id);
+                    }
+                });
                 container.appendChild(el);
 
                 expeditionTravelers.push({
@@ -2825,7 +2999,7 @@ function renderExpeditions() {
         }).join('');
 
         return `
-            <article class="expedition-card${isOpen ? ' is-open' : ''}" data-expedition="${exp.id}">
+            <article class="expedition-card${isOpen ? ' is-open' : ''}${currentExpeditionId === exp.id ? ' is-linked' : ''}" data-expedition="${exp.id}">
                 <button type="button" class="expedition-card-toggle" aria-expanded="${isOpen ? 'true' : 'false'}" aria-controls="expedition-body-${exp.id}">
                     <span class="expedition-card-header-text">
                         <span class="expedition-card-name">${t[exp.nameKey]}</span>
@@ -2845,7 +3019,7 @@ function renderExpeditions() {
             e.stopPropagation();
             const card = btn.closest('.expedition-card');
             if (!card) return;
-            toggleExpedition(card.dataset.expedition);
+            selectExpeditionGroup(card.dataset.expedition);
         });
     });
 }
