@@ -39,7 +39,13 @@ const translations = {
         // Content headings
         researchActivities: "Research Activities",
         facilitiesInfra: "Facilities & Infrastructure",
-        geographicFeatures: "Geographic Features"
+        geographicFeatures: "Geographic Features",
+        weatherForecast: "Weather forecast for James Ross Island",
+        weatherForecastNelson: "Weather forecast for Nelson Island",
+        weatherHumidity: "Humidity",
+        weatherLoading: "Loading weather…",
+        weatherError: "Weather unavailable",
+        weatherWind: "Wind"
     },
     cs: {
         logoSubtitle: "Antarktický Průzkumník",
@@ -64,7 +70,13 @@ const translations = {
         // Content headings
         researchActivities: "Výzkumné aktivity",
         facilitiesInfra: "Vybavení & Infrastruktura",
-        geographicFeatures: "Geografické charakteristiky"
+        geographicFeatures: "Geografické charakteristiky",
+        weatherForecast: "Předpověď počasí pro ostrov Jamese Rosse",
+        weatherForecastNelson: "Předpověď počasí pro Nelsonův ostrov",
+        weatherHumidity: "Vlhkost",
+        weatherLoading: "Načítání počasí…",
+        weatherError: "Počasí nedostupné",
+        weatherWind: "Vítr"
     }
 };
 
@@ -684,29 +696,29 @@ function createMarker(lat, lon, icon) {
     group.position.set(x, y, z);
 
     // Simple glowing dot
-    const dotGeometry = new THREE.SphereGeometry(0.025, 16, 16);
+    const dotGeometry = new THREE.SphereGeometry(0.014, 16, 16);
     const dotMaterial = new THREE.MeshBasicMaterial({
         color: 0xc9a961,  // Compass gold
         transparent: true,
-        opacity: 0.9
+        opacity: 0.95
     });
     const dot = new THREE.Mesh(dotGeometry, dotMaterial);
 
     // Outer glow ring
-    const glowGeometry = new THREE.SphereGeometry(0.04, 16, 16);
+    const glowGeometry = new THREE.SphereGeometry(0.022, 16, 16);
     const glowMaterial = new THREE.MeshBasicMaterial({
         color: 0xc9a961,
         transparent: true,
-        opacity: 0.3
+        opacity: 0.28
     });
     const glow = new THREE.Mesh(glowGeometry, glowMaterial);
 
     // Pulsing ring
-    const ringGeometry = new THREE.RingGeometry(0.05, 0.06, 32);
+    const ringGeometry = new THREE.RingGeometry(0.026, 0.032, 32);
     const ringMaterial = new THREE.MeshBasicMaterial({
         color: 0xc9a961,
         transparent: true,
-        opacity: 0.5,
+        opacity: 0.45,
         side: THREE.DoubleSide
     });
     const ring = new THREE.Mesh(ringGeometry, ringMaterial);
@@ -862,8 +874,9 @@ function onMouseMove(event) {
 }
 
 function onClick(event) {
-    // Prevent if clicking on UI elements
+    // Prevent if clicking on UI elements or weather pin
     if (event.target.closest('#ui-overlay > *:not(canvas)')) return;
+    if (event.target.closest('#weather-pins, .weather-pin')) return;
 
     raycaster.setFromCamera(mouse, camera);
     const intersects = raycaster.intersectObjects(markers);
@@ -1499,6 +1512,9 @@ function animate() {
     // Update connection line
     updateConnectionLine();
 
+    // Keep weather pin glued to Mendel marker
+    updateWeatherPinPosition();
+
     renderer.render(scene, camera);
 }
 
@@ -1628,13 +1644,23 @@ function switchLanguage(lang) {
     if (currentLocationData) {
         updateTabContent();
     }
+
+    updateWeatherPinLabels();
+    WEATHER_STATIONS.forEach(station => {
+        if (weatherState[station.id] && weatherState[station.id].expanded) {
+            renderWeatherForecast(station.id);
+        }
+    });
 }
 
 // Setup language switcher
 function setupLanguageSwitcher() {
-    document.querySelectorAll('.lang-btn').forEach(btn => {
+    document.querySelectorAll('.flag-btn, .lang-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             switchLanguage(btn.dataset.lang);
+            document.querySelectorAll('.flag-btn, .lang-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.lang === btn.dataset.lang);
+            });
         });
     });
 }
@@ -2289,6 +2315,393 @@ function showPersonalCard(person) {
     }, 200);
 }
 
+/* ========== Weather pins (YR / MET Norway) ========== */
+const WEATHER_ICON_BASE = 'https://cdn.jsdelivr.net/gh/metno/weathericons@main/weather/svg/';
+
+const WEATHER_STATIONS = [
+    {
+        id: 'mendel',
+        locationKey: 'mendel',
+        lat: -63.8015,
+        lon: -57.8825,
+        yrLocationId: '2-6620713',
+        yrUrlEn: 'https://www.yr.no/en/forecast/daily-table/2-6620713',
+        yrUrlCs: 'https://www.yr.no/nb/værvarsel/daglig-tabell/2-6620713',
+        titleKey: 'weatherForecast',
+        // Offset badge away from marker (px)
+        offset: { x: 48, y: -28 },
+        side: 'right'
+    },
+    {
+        id: 'nelson',
+        locationKey: 'nelson',
+        lat: -62.2430,
+        lon: -58.9806,
+        yrLocationId: '2-13353920',
+        yrUrlEn: 'https://www.yr.no/en/forecast/daily-table/2-13353920',
+        yrUrlCs: 'https://www.yr.no/nb/værvarsel/daglig-tabell/2-13353920',
+        titleKey: 'weatherForecastNelson',
+        offset: { x: -48, y: -28 },
+        side: 'left'
+    }
+];
+
+const weatherState = {};
+
+function setupWeatherPin() {
+    const container = document.getElementById('weather-pins');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    WEATHER_STATIONS.forEach(station => {
+        weatherState[station.id] = {
+            data: null,
+            expanded: false,
+            fetchPromise: null
+        };
+
+        const ox = station.offset.x;
+        const oy = station.offset.y;
+        // Anchor badge so the near edge sits on the offset point
+        const contentTransform = station.side === 'left'
+            ? 'translate(-100%, -50%)'
+            : 'translate(0, -50%)';
+
+        const pin = document.createElement('div');
+        pin.className = 'weather-pin hidden';
+        pin.dataset.station = station.id;
+        pin.dataset.side = station.side;
+        pin.setAttribute('aria-live', 'polite');
+        pin.innerHTML = `
+            <svg class="weather-pin-leader" width="1" height="1" aria-hidden="true">
+                <line class="weather-pin-line-bg" x1="0" y1="0" x2="0" y2="0"></line>
+                <line class="weather-pin-line" x1="0" y1="0" x2="0" y2="0"></line>
+                <circle class="weather-pin-dot" cx="0" cy="0" r="2.5"></circle>
+            </svg>
+            <div class="weather-pin-content" style="left:${ox}px;top:${oy}px;transform:${contentTransform}">
+                <button type="button" class="weather-pin-badge" aria-expanded="false">
+                    <img class="weather-pin-icon" src="" alt="" hidden>
+                    <span class="weather-pin-temp">–</span>
+                    <span class="weather-pin-humidity">–</span>
+                </button>
+                <div class="weather-pin-forecast" hidden>
+                    <div class="weather-pin-forecast-header">
+                        <h4 class="weather-pin-title"></h4>
+                        <button type="button" class="weather-pin-close" aria-label="Close">×</button>
+                    </div>
+                    <div class="weather-pin-forecast-body">
+                        <p class="weather-pin-loading">Loading…</p>
+                    </div>
+                    <a class="weather-pin-yr-link" href="${station.yrUrlEn}" target="_blank" rel="noopener noreferrer">yr.no</a>
+                </div>
+            </div>
+        `;
+
+        container.appendChild(pin);
+
+        const toggle = pin.querySelector('.weather-pin-badge');
+        const closeBtn = pin.querySelector('.weather-pin-close');
+        const forecast = pin.querySelector('.weather-pin-forecast');
+
+        toggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            // Close other expanded pins
+            WEATHER_STATIONS.forEach(s => {
+                if (s.id !== station.id && weatherState[s.id].expanded) {
+                    weatherState[s.id].expanded = false;
+                    const other = getWeatherPinEl(s.id);
+                    if (other) {
+                        other.querySelector('.weather-pin-forecast').hidden = true;
+                        other.querySelector('.weather-pin-badge').setAttribute('aria-expanded', 'false');
+                    }
+                }
+            });
+
+            weatherState[station.id].expanded = !weatherState[station.id].expanded;
+            forecast.hidden = !weatherState[station.id].expanded;
+            toggle.setAttribute('aria-expanded', weatherState[station.id].expanded ? 'true' : 'false');
+            if (weatherState[station.id].expanded) {
+                renderWeatherForecast(station.id);
+            }
+        });
+
+        closeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            weatherState[station.id].expanded = false;
+            forecast.hidden = true;
+            toggle.setAttribute('aria-expanded', 'false');
+        });
+
+        pin.addEventListener('mousedown', (e) => e.stopPropagation());
+        pin.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
+
+        fetchStationWeather(station.id);
+    });
+
+    updateWeatherPinLabels();
+    setInterval(() => {
+        WEATHER_STATIONS.forEach(s => fetchStationWeather(s.id));
+    }, 30 * 60 * 1000);
+}
+
+function getWeatherPinEl(stationId) {
+    return document.querySelector(`.weather-pin[data-station="${stationId}"]`);
+}
+
+function getWeatherStation(stationId) {
+    return WEATHER_STATIONS.find(s => s.id === stationId);
+}
+
+function updateWeatherPinLabels() {
+    const t = translations[currentLanguage];
+    WEATHER_STATIONS.forEach(station => {
+        const pin = getWeatherPinEl(station.id);
+        if (!pin) return;
+        const title = pin.querySelector('.weather-pin-title');
+        const link = pin.querySelector('.weather-pin-yr-link');
+        if (title) title.textContent = t[station.titleKey] || t.weatherForecast;
+        if (link) {
+            link.textContent = 'yr.no';
+            link.href = currentLanguage === 'cs' ? station.yrUrlCs : station.yrUrlEn;
+        }
+    });
+}
+
+async function fetchStationWeather(stationId) {
+    const station = getWeatherStation(stationId);
+    const state = weatherState[stationId];
+    if (!station || !state) return;
+    if (state.fetchPromise) return state.fetchPromise;
+
+    const url = `https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${station.lat}&lon=${station.lon}`;
+
+    state.fetchPromise = fetch(url)
+        .then(res => {
+            if (!res.ok) throw new Error('Weather request failed');
+            return res.json();
+        })
+        .then(data => {
+            state.data = data;
+            updateWeatherPinBadge(stationId);
+            if (state.expanded) renderWeatherForecast(stationId);
+        })
+        .catch(err => {
+            console.warn(`YR weather fetch failed (${stationId}):`, err);
+            const pin = getWeatherPinEl(stationId);
+            if (!pin) return;
+            const tempEl = pin.querySelector('.weather-pin-temp');
+            const humEl = pin.querySelector('.weather-pin-humidity');
+            if (tempEl) tempEl.textContent = '–';
+            if (humEl) humEl.textContent = translations[currentLanguage].weatherError;
+        })
+        .finally(() => {
+            state.fetchPromise = null;
+        });
+
+    return state.fetchPromise;
+}
+
+function getWeatherIconUrl(symbolCode) {
+    if (!symbolCode) return '';
+    return `${WEATHER_ICON_BASE}${symbolCode}.svg`;
+}
+
+function updateWeatherPinBadge(stationId) {
+    const state = weatherState[stationId];
+    const pin = getWeatherPinEl(stationId);
+    if (!state || !state.data || !pin) return;
+    if (!state.data.properties || !state.data.properties.timeseries.length) return;
+
+    const now = state.data.properties.timeseries[0];
+    const details = now.data.instant.details;
+    const symbol = (now.data.next_1_hours && now.data.next_1_hours.summary.symbol_code)
+        || (now.data.next_6_hours && now.data.next_6_hours.summary.symbol_code)
+        || '';
+
+    const tempEl = pin.querySelector('.weather-pin-temp');
+    const humEl = pin.querySelector('.weather-pin-humidity');
+    const iconEl = pin.querySelector('.weather-pin-icon');
+
+    if (tempEl) {
+        const temp = details.air_temperature;
+        tempEl.textContent = `${temp > 0 ? '+' : ''}${Math.round(temp * 10) / 10}°C`;
+    }
+    if (humEl) {
+        humEl.textContent = `${Math.round(details.relative_humidity)}%`;
+        humEl.title = translations[currentLanguage].weatherHumidity;
+    }
+    if (iconEl && symbol) {
+        iconEl.src = getWeatherIconUrl(symbol);
+        iconEl.hidden = false;
+        iconEl.alt = symbol.replace(/_/g, ' ');
+    }
+}
+
+function buildDailyForecast(timeseries) {
+    const days = new Map();
+
+    timeseries.forEach(entry => {
+        const date = new Date(entry.time);
+        const key = date.toISOString().slice(0, 10);
+        if (!days.has(key)) {
+            days.set(key, {
+                date,
+                temps: [],
+                humidities: [],
+                winds: [],
+                symbol: null,
+                symbolHour: null
+            });
+        }
+        const day = days.get(key);
+        const details = entry.data.instant.details;
+        day.temps.push(details.air_temperature);
+        day.humidities.push(details.relative_humidity);
+        day.winds.push(details.wind_speed);
+
+        const symbol = (entry.data.next_6_hours && entry.data.next_6_hours.summary.symbol_code)
+            || (entry.data.next_12_hours && entry.data.next_12_hours.summary.symbol_code)
+            || (entry.data.next_1_hours && entry.data.next_1_hours.summary.symbol_code);
+
+        const hour = date.getUTCHours();
+        if (symbol && (day.symbol == null || Math.abs(hour - 12) < Math.abs((day.symbolHour ?? 99) - 12))) {
+            day.symbol = symbol;
+            day.symbolHour = hour;
+        }
+    });
+
+    return Array.from(days.values()).slice(0, 6);
+}
+
+function renderWeatherForecast(stationId) {
+    const station = getWeatherStation(stationId);
+    const state = weatherState[stationId];
+    const pin = getWeatherPinEl(stationId);
+    if (!station || !state || !pin) return;
+
+    const body = pin.querySelector('.weather-pin-forecast-body');
+    if (!body) return;
+
+    const t = translations[currentLanguage];
+    updateWeatherPinLabels();
+
+    if (!state.data) {
+        body.innerHTML = `<p class="weather-pin-loading">${t.weatherLoading}</p>`;
+        fetchStationWeather(stationId);
+        return;
+    }
+
+    const days = buildDailyForecast(state.data.properties.timeseries);
+    const locale = currentLanguage === 'cs' ? 'cs-CZ' : 'en-GB';
+
+    body.innerHTML = days.map(day => {
+        const name = day.date.toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short' });
+        const min = Math.round(Math.min(...day.temps));
+        const max = Math.round(Math.max(...day.temps));
+        const humidity = Math.round(day.humidities.reduce((a, b) => a + b, 0) / day.humidities.length);
+        const wind = (day.winds.reduce((a, b) => a + b, 0) / day.winds.length).toFixed(1);
+        const icon = day.symbol ? `<img src="${getWeatherIconUrl(day.symbol)}" alt="">` : '<span></span>';
+
+        return `
+            <div class="weather-day">
+                <span class="weather-day-name">${name}</span>
+                ${icon}
+                <span class="weather-day-temps">${max}°<span>${min}°</span></span>
+                <span class="weather-day-extra">${humidity}% · ${wind} m/s</span>
+            </div>
+        `;
+    }).join('');
+}
+
+function updateWeatherPinPosition() {
+    if (!camera || !markers.length) return;
+
+    WEATHER_STATIONS.forEach(station => {
+        const pin = getWeatherPinEl(station.id);
+        if (!pin) return;
+
+        const markerIndex = Object.keys(locations).indexOf(station.locationKey);
+        const marker = markers[markerIndex];
+        if (!marker) {
+            pin.classList.add('hidden');
+            return;
+        }
+
+        const worldPos = new THREE.Vector3();
+        marker.getWorldPosition(worldPos);
+
+        const toCamera = camera.position.clone().sub(worldPos).normalize();
+        const outward = worldPos.clone().normalize();
+        const facing = outward.dot(toCamera);
+
+        const screenPos = worldPos.clone().project(camera);
+        const onScreen = screenPos.x > -1.15 && screenPos.x < 1.15
+            && screenPos.y > -1.15 && screenPos.y < 1.15
+            && screenPos.z < 1;
+
+        if (facing < 0.05 || !onScreen) {
+            pin.classList.add('hidden');
+            return;
+        }
+
+        const x = (screenPos.x * 0.5 + 0.5) * window.innerWidth;
+        const y = (screenPos.y * -0.5 + 0.5) * window.innerHeight;
+
+        pin.style.left = `${x}px`;
+        pin.style.top = `${y}px`;
+        pin.classList.remove('hidden');
+
+        // Draw leader from marker origin to the near edge of the badge
+        updateWeatherLeaderLine(pin, station);
+    });
+}
+
+function updateWeatherLeaderLine(pin, station) {
+    const badge = pin.querySelector('.weather-pin-badge');
+    const svg = pin.querySelector('.weather-pin-leader');
+    const line = pin.querySelector('.weather-pin-line');
+    const lineBg = pin.querySelector('.weather-pin-line-bg');
+    const dot = pin.querySelector('.weather-pin-dot');
+    if (!badge || !svg || !line || !lineBg || !dot) return;
+
+    const pinRect = pin.getBoundingClientRect();
+    const badgeRect = badge.getBoundingClientRect();
+
+    // End at middle of the badge edge facing the marker
+    const endX = station.side === 'left'
+        ? badgeRect.right - pinRect.left
+        : badgeRect.left - pinRect.left;
+    const endY = badgeRect.top + badgeRect.height / 2 - pinRect.top;
+
+    const pad = 8;
+    const minX = Math.min(0, endX) - pad;
+    const minY = Math.min(0, endY) - pad;
+    const maxX = Math.max(0, endX) + pad;
+    const maxY = Math.max(0, endY) + pad;
+    const width = Math.max(1, maxX - minX);
+    const height = Math.max(1, maxY - minY);
+
+    svg.setAttribute('width', String(width));
+    svg.setAttribute('height', String(height));
+    svg.style.left = `${minX}px`;
+    svg.style.top = `${minY}px`;
+
+    const x1 = 0 - minX;
+    const y1 = 0 - minY;
+    const x2 = endX - minX;
+    const y2 = endY - minY;
+
+    [lineBg, line].forEach(el => {
+        el.setAttribute('x1', String(x1));
+        el.setAttribute('y1', String(y1));
+        el.setAttribute('x2', String(x2));
+        el.setAttribute('y2', String(y2));
+    });
+    dot.setAttribute('cx', String(x1));
+    dot.setAttribute('cy', String(y1));
+}
+
 // Start the application
 window.addEventListener('load', () => {
     init();
@@ -2298,5 +2711,6 @@ window.addEventListener('load', () => {
         setupLanguageSwitcher();
         setupLogoReset();
         setupInfoCards();
+        setupWeatherPin();
     }, 100);
 });

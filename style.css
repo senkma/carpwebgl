@@ -1888,3 +1888,241 @@ body::after {
         height: 80px;
     }
 }
+
+/* ========== Weather pins on globe ========== */
+.weather-pin {
+    position: fixed;
+    z-index: 160;
+    pointer-events: none;
+    width: 0;
+    height: 0;
+    overflow: visible;
+    transition: opacity 0.25s ease;
+}
+
+.weather-pin.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.weather-pin-leader {
+    position: absolute;
+    left: 0;
+    top: 0;
+    overflow: visible;
+    pointer-events: none;
+}
+
+.weather-pin-leader line.weather-pin-line-bg {
+    stroke: rgba(255, 255, 255, 0.9);
+    stroke-width: 4;
+    stroke-linecap: round;
+}
+
+.weather-pin-leader line.weather-pin-line {
+    stroke: #c9a961;
+    stroke-width: 2;
+    stroke-linecap: round;
+}
+
+.weather-pin-leader circle {
+    fill: #c9a961;
+    stroke: rgba(255, 255, 255, 0.95);
+    stroke-width: 1.5;
+}
+
+.weather-pin-content {
+    position: absolute;
+    left: 0;
+    top: 0;
+    pointer-events: none;
+}
+
+.weather-pin-badge {
+    pointer-events: all;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 7px;
+    border: 1px solid rgba(139, 115, 85, 0.4);
+    border-radius: 999px;
+    background: rgba(244, 232, 208, 0.96);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 2px 8px rgba(45, 36, 22, 0.18);
+    cursor: pointer;
+    font-family: 'Rajdhani', sans-serif;
+    color: #2d2416;
+    white-space: nowrap;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.weather-pin-badge:hover {
+    transform: scale(1.04);
+    box-shadow: 0 4px 12px rgba(45, 36, 22, 0.24);
+}
+
+.weather-pin-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.weather-pin-temp {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+}
+
+.weather-pin-humidity {
+    font-size: 10px;
+    font-weight: 600;
+    opacity: 0.75;
+    padding-left: 3px;
+    border-left: 1px solid rgba(139, 115, 85, 0.35);
+}
+
+.weather-pin-forecast {
+    pointer-events: all;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    width: 280px;
+    background: rgba(255, 255, 255, 0.97);
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.weather-pin[data-side="left"] .weather-pin-forecast {
+    left: auto;
+    right: 0;
+}
+
+.weather-pin-forecast-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 12px 6px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.weather-pin-forecast-header h4 {
+    margin: 0;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #1a1a1a;
+    letter-spacing: 0.3px;
+    line-height: 1.25;
+}
+
+.weather-pin-close {
+    border: none;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 6px;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    color: #333;
+    flex-shrink: 0;
+}
+
+.weather-pin-close:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.weather-pin-forecast-body {
+    padding: 8px 10px 4px;
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+.weather-pin-loading,
+.weather-pin-error {
+    margin: 8px;
+    font-size: 13px;
+    color: #666;
+    font-family: 'Rajdhani', sans-serif;
+}
+
+.weather-day {
+    display: grid;
+    grid-template-columns: 62px 28px 1fr auto;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 4px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px;
+    color: #2d2416;
+}
+
+.weather-day:last-child {
+    border-bottom: none;
+}
+
+.weather-day-name {
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.weather-day img {
+    width: 26px;
+    height: 26px;
+}
+
+.weather-day-temps {
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.weather-day-temps span {
+    font-weight: 500;
+    opacity: 0.55;
+    margin-left: 4px;
+}
+
+.weather-day-extra {
+    font-size: 11px;
+    opacity: 0.7;
+    text-align: right;
+}
+
+.weather-pin-yr-link {
+    display: block;
+    text-align: center;
+    padding: 8px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #11457E;
+    text-decoration: none;
+    background: rgba(17, 69, 126, 0.06);
+}
+
+.weather-pin-yr-link:hover {
+    background: rgba(17, 69, 126, 0.12);
+}
+
+@media (max-width: 768px) {
+    .weather-pin-forecast {
+        width: 240px;
+    }
+
+    .weather-pin-badge {
+        padding: 2px 6px;
+        gap: 3px;
+    }
+
+    .weather-pin-temp {
+        font-size: 11px;
+    }
+
+    .weather-pin-humidity {
+        font-size: 9px;
+    }
+}
