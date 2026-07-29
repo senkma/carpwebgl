@@ -1149,22 +1149,21 @@ function updateButtonPositions() {
     const overviewBtn = document.getElementById('tab-overview');
     const researchBtn = document.getElementById('tab-research');
     const facilitiesBtn = document.getElementById('tab-facilities');
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
-    if (overviewBtn.style.display !== 'none') {
-        const overviewWidth = overviewBtn.offsetWidth;
-        overviewBtn.style.right = `-${overviewWidth}px`;
-    }
-
-    if (researchBtn.style.display !== 'none') {
-        const researchWidth = researchBtn.offsetWidth;
-        researchBtn.style.right = `-${researchWidth}px`;
-    }
-
-    if (facilitiesBtn.style.display !== 'none') {
-        const facilitiesWidth = facilitiesBtn.offsetWidth;
-        facilitiesBtn.style.right = `-${facilitiesWidth}px`;
-    }
+    [overviewBtn, researchBtn, facilitiesBtn].forEach(btn => {
+        if (!btn) return;
+        if (isMobile || btn.style.display === 'none') {
+            btn.style.right = '';
+            return;
+        }
+        btn.style.right = `-${btn.offsetWidth}px`;
+    });
 }
+
+window.addEventListener('resize', () => {
+    updateButtonPositions();
+});
 
 // Switch to a specific tab
 function switchToTab(tabName) {
