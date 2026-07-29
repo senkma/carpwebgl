@@ -15,6 +15,7 @@ let autoRotateEnabled = true;
 let currentLanguage = 'en';
 let expeditionRouteGroup = null;
 let expeditionTravelers = [];
+let expeditionStopLabels = [];
 let expeditionArcMeshes = [];
 
 // Translations
@@ -56,6 +57,7 @@ const translations = {
         expeditionBoat: "Boat transfer",
         expeditionShip: "Ship transfer",
         expeditionFlight: "Flight",
+        expeditionBus: "Bus",
         expeditionHotel: "Overnight",
         expeditionInProgress: "In progress",
         expeditionAsOf: "Status as of"
@@ -97,6 +99,7 @@ const translations = {
         expeditionBoat: "Přesun člunem",
         expeditionShip: "Lodní přesun",
         expeditionFlight: "Let",
+        expeditionBus: "Autobus",
         expeditionHotel: "Ubytování",
         expeditionInProgress: "Probíhá",
         expeditionAsOf: "Stav ke dni"
@@ -1853,6 +1856,9 @@ function switchLanguage(lang) {
     });
 
     renderExpeditions();
+    if (typeof createExpeditionRoutes === 'function' && globe) {
+        createExpeditionRoutes();
+    }
 }
 
 // Setup language switcher
@@ -2520,6 +2526,7 @@ function showPersonalCard(person) {
 /* ========== Expeditions 2027 schedule ========== */
 const EXPEDITION_ICONS = {
     plane: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5L21 16z"/></svg>',
+    bus: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16c0 .88.39 1.67 1 2.22V20a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-1h8v1a1 1 0 0 0 1 1h1a1 1 0 0 0 1-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10zm3.5 1a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm9 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zM18 10H6V6h12v4z"/></svg>',
     boat: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17.5c1.5 1.2 3.4 2 5.5 2s4-.8 5.5-2c1.5 1.2 3.4 2 5.5 2 .5 0 1-.05 1.5-.15V18c-.5.1-1 .15-1.5.15-1.7 0-3.3-.5-4.6-1.35L12 7 6.6 16.8C5.3 17.65 3.7 18.15 2 18.15c-.5 0-1-.05-1.5-.15v1.35c.5.1 1 .15 1.5.15 2.1 0 4-.8 5.5-2zM12 4l1.2 2.5H10.8L12 4z"/></svg>',
     ship: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21c-1.39 0-2.78-.47-4-1.32-2.44 1.71-5.56 1.71-8 0C6.78 20.53 5.39 21 4 21H2v2h2c1.38 0 2.74-.35 4-.99 2.52 1.29 5.48 1.29 8 0 1.26.65 2.62.99 4 .99h2v-2h-2zM3.95 19H4c1.6 0 3.02-.88 4-2 .98 1.12 2.4 2 4 2s3.02-.88 4-2c.98 1.12 2.4 2 4 2h.05l1.22-3.04L13.2 5H11V2H6v3H4.8l-3.07 10.96L3.95 19zM6.5 7h5.6l3.86 9H6.5L8 9h2V7H6.5z"/></svg>',
     hotel: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 13c1.66 0 3-1.34 3-3S8.66 7 7 7s-3 1.34-3 3 1.34 3 3 3zm12-6h-8v7H3V5H1v15h2v-3h18v3h2v-9c0-2.21-1.79-4-4-4z"/></svg>',
@@ -2533,6 +2540,7 @@ const EXPEDITIONS_2027 = [
         start: '2027-01-05',
         end: '2027-04-04',
         steps: [
+            { date: '2027-01-05', type: 'bus', from: { en: 'Brno', cs: 'Brno' }, to: { en: 'Vienna', cs: 'Vídeň' }, noteKey: 'expeditionBus' },
             { date: '2027-01-05', type: 'plane', from: { en: 'Vienna', cs: 'Vídeň' }, to: { en: 'Madrid', cs: 'Madrid' } },
             { date: '2027-01-05', type: 'hotel', place: { en: 'Madrid', cs: 'Madrid' } },
             { date: '2027-01-06', type: 'plane', from: { en: 'Madrid', cs: 'Madrid' }, to: { en: 'Buenos Aires', cs: 'Buenos Aires' } },
@@ -2550,6 +2558,7 @@ const EXPEDITIONS_2027 = [
         start: '2027-01-27',
         end: '2027-03-03',
         steps: [
+            { date: '2027-01-27', type: 'bus', from: { en: 'Brno', cs: 'Brno' }, to: { en: 'Vienna', cs: 'Vídeň' }, noteKey: 'expeditionBus' },
             { date: '2027-01-27', type: 'plane', from: { en: 'Vienna', cs: 'Vídeň' }, to: { en: 'Madrid', cs: 'Madrid' } },
             { date: '2027-01-27', type: 'hotel', place: { en: 'Madrid', cs: 'Madrid' } },
             { date: '2027-02-02', type: 'plane', from: { en: 'Madrid', cs: 'Madrid' }, to: { en: 'Santiago (SCL)', cs: 'Santiago (SCL)' }, noteKey: 'expeditionFlight' },
@@ -2578,6 +2587,7 @@ const expeditionOpenState = {
 const EXPEDITION_SIMULATED_NOW = new Date('2027-02-02T14:00:00');
 
 const EXPEDITION_PLACE_COORDS = {
+    'Brno': { lat: 49.20, lon: 16.61 },
     'Vienna': { lat: 48.21, lon: 16.37 },
     'Madrid': { lat: 40.42, lon: -3.70 },
     'Buenos Aires': { lat: -34.60, lon: -58.38 },
@@ -2594,6 +2604,10 @@ const EXPEDITION_ROUTE_COLORS = {
     mendel: 0xff4d6d,  // vivid coral — readable on ice & ocean
     nelson: 0xffc14d
 };
+
+function isExpeditionTransportType(type) {
+    return type === 'plane' || type === 'bus' || type === 'boat' || type === 'ship';
+}
 
 function getExpeditionNow() {
     return EXPEDITION_SIMULATED_NOW;
@@ -2741,6 +2755,8 @@ function createRouteWaypoint(lat, lon, color, state) {
     group.position.copy(latLonToVector3(lat, lon, 2.04));
     group.lookAt(0, 0, 0);
     group.userData.isWaypoint = true;
+    group.userData.lat = lat;
+    group.userData.lon = lon;
     if (state === 'pending') {
         group.traverse(obj => {
             if (obj.material) {
@@ -2750,6 +2766,22 @@ function createRouteWaypoint(lat, lon, color, state) {
         });
     }
     return group;
+}
+
+function createExpeditionStopLabel(place, coords, state, expId) {
+    const lang = currentLanguage;
+    const el = document.createElement('div');
+    el.className = `expedition-stop-label${state === 'pending' ? ' pending' : ''}${state === 'active' ? ' active' : ''}`;
+    el.dataset.exp = expId;
+    el.textContent = (place && (place[lang] || place.en)) || '';
+    return {
+        el,
+        lat: coords.lat,
+        lon: coords.lon,
+        place,
+        state,
+        expId
+    };
 }
 
 function createExpeditionRoutes() {
@@ -2765,6 +2797,7 @@ function createExpeditionRoutes() {
     }
     expeditionArcMeshes = [];
     expeditionTravelers = [];
+    expeditionStopLabels = [];
 
     const container = document.getElementById('expedition-travelers');
     if (container) container.innerHTML = '';
@@ -2775,12 +2808,13 @@ function createExpeditionRoutes() {
 
     const now = getExpeditionNow();
     const seenWaypoints = new Set();
+    // One city label shared across expeditions (prefer more "active" state)
+    const cityLabelRank = { pending: 0, done: 1, active: 2 };
+    const cityLabels = new Map();
 
     EXPEDITIONS_2027.forEach(exp => {
         const color = EXPEDITION_ROUTE_COLORS[exp.id] || 0xc9a961;
-        const transportSteps = exp.steps.filter(s =>
-            s.type === 'plane' || s.type === 'boat' || s.type === 'ship'
-        );
+        const transportSteps = exp.steps.filter(s => isExpeditionTransportType(s.type));
 
         transportSteps.forEach(step => {
             const fromName = step.from && step.from.en;
@@ -2796,13 +2830,23 @@ function createExpeditionRoutes() {
             expeditionRouteGroup.add(arc);
             expeditionArcMeshes.push(arc);
 
-            // Waypoints
-            [[fromName, from], [toName, to]].forEach(([name, coords]) => {
+            // Waypoints + city labels
+            [
+                [fromName, from, step.from],
+                [toName, to, step.to]
+            ].forEach(([name, coords, place]) => {
                 const key = `${exp.id}:${name}`;
-                if (seenWaypoints.has(key)) return;
-                seenWaypoints.add(key);
-                const wpState = state === 'pending' ? 'pending' : (state === 'active' ? 'active' : 'done');
-                expeditionRouteGroup.add(createRouteWaypoint(coords.lat, coords.lon, color, wpState));
+                if (!seenWaypoints.has(key)) {
+                    seenWaypoints.add(key);
+                    const wpState = state === 'pending' ? 'pending' : (state === 'active' ? 'active' : 'done');
+                    expeditionRouteGroup.add(createRouteWaypoint(coords.lat, coords.lon, color, wpState));
+                }
+
+                const labelState = state === 'pending' ? 'pending' : (state === 'active' ? 'active' : 'done');
+                const existing = cityLabels.get(name);
+                if (!existing || cityLabelRank[labelState] > cityLabelRank[existing.state]) {
+                    cityLabels.set(name, { place, coords, state: labelState, expId: exp.id });
+                }
             });
 
             if (state === 'active' && container) {
@@ -2839,24 +2883,51 @@ function createExpeditionRoutes() {
             }
         });
     });
+
+    if (container) {
+        cityLabels.forEach(({ place, coords, state, expId }) => {
+            const stop = createExpeditionStopLabel(place, coords, state, expId);
+            container.appendChild(stop.el);
+            expeditionStopLabels.push(stop);
+        });
+    }
+}
+
+function projectGlobeLatLonToScreen(lat, lon, radius = 2.04) {
+    if (!camera || !globe) return null;
+
+    const localPos = latLonToVector3(lat, lon, radius);
+    const worldPos = localPos.clone();
+    globe.localToWorld(worldPos);
+
+    const cameraDir = camera.position.clone().normalize();
+    const facing = worldPos.clone().normalize().dot(cameraDir);
+    const screenPos = worldPos.clone().project(camera);
+    const onScreen = screenPos.x > -1.25 && screenPos.x < 1.25
+        && screenPos.y > -1.25 && screenPos.y < 1.25
+        && screenPos.z < 1;
+
+    if (facing < 0.08 || !onScreen) return null;
+
+    return {
+        x: (screenPos.x * 0.5 + 0.5) * window.innerWidth,
+        y: (screenPos.y * -0.5 + 0.5) * window.innerHeight
+    };
 }
 
 function updateExpeditionRoutes() {
-    if (!camera || !globe || !expeditionTravelers.length) return;
-
-    const cameraDir = camera.position.clone().normalize();
+    if (!camera || !globe) return;
 
     expeditionTravelers.forEach(traveler => {
-        // Static icon at the midpoint of the active segment
         const localPos = pointOnRouteArc(
             traveler.from.lat, traveler.from.lon,
             traveler.to.lat, traveler.to.lon,
             0.5
         );
-
         const worldPos = localPos.clone();
         globe.localToWorld(worldPos);
 
+        const cameraDir = camera.position.clone().normalize();
         const facing = worldPos.clone().normalize().dot(cameraDir);
         const screenPos = worldPos.clone().project(camera);
         const onScreen = screenPos.x > -1.2 && screenPos.x < 1.2
@@ -2873,6 +2944,17 @@ function updateExpeditionRoutes() {
         traveler.el.style.left = `${x}px`;
         traveler.el.style.top = `${y}px`;
         traveler.el.classList.remove('hidden');
+    });
+
+    expeditionStopLabels.forEach(stop => {
+        const screen = projectGlobeLatLonToScreen(stop.lat, stop.lon);
+        if (!screen) {
+            stop.el.classList.add('hidden');
+            return;
+        }
+        stop.el.style.left = `${screen.x}px`;
+        stop.el.style.top = `${screen.y}px`;
+        stop.el.classList.remove('hidden');
     });
 }
 
@@ -2893,7 +2975,7 @@ function localizedPlace(place, lang) {
 
 function getExpeditionStepLabel(step, lang) {
     const t = translations[lang];
-    if (step.type === 'plane' || step.type === 'boat' || step.type === 'ship') {
+    if (isExpeditionTransportType(step.type)) {
         return `${localizedPlace(step.from, lang)} → ${localizedPlace(step.to, lang)}`;
     }
     if (step.type === 'hotel') {
@@ -2909,6 +2991,7 @@ function getExpeditionStepMeta(step, lang) {
     const t = translations[lang];
     const dateLabel = formatExpeditionDate(step.date, lang);
     const typeLabel = step.type === 'plane' ? t.expeditionFlight
+        : step.type === 'bus' ? t.expeditionBus
         : step.type === 'boat' ? t.expeditionBoat
         : step.type === 'ship' ? t.expeditionShip
         : step.type === 'hotel' ? t.expeditionHotel
@@ -2935,11 +3018,11 @@ function getExpeditionStepState(step, allSteps = null, now = getExpeditionNow())
     if (step.date === todayIso) {
         if (step.type === 'stay' && allSteps) {
             const sameDayTransport = allSteps.some(s =>
-                s.date === step.date && (s.type === 'plane' || s.type === 'boat' || s.type === 'ship')
+                s.date === step.date && isExpeditionTransportType(s.type)
             );
             if (sameDayTransport) return 'pending';
         }
-        if (step.type === 'plane' || step.type === 'boat' || step.type === 'ship' || step.type === 'hotel') {
+        if (isExpeditionTransportType(step.type) || step.type === 'hotel') {
             return 'active';
         }
         if (step.type === 'stay') return 'active';

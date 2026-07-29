@@ -145,21 +145,58 @@ body::after {
     font-weight: 700;
     letter-spacing: 0.8px;
     text-transform: uppercase;
-    color: #ffffff;
-    background: rgba(20, 14, 10, 0.78);
+    color: #2d2416;
+    background: rgba(244, 232, 208, 0.95);
     padding: 2px 7px;
     border-radius: 3px;
-    border: 1px solid rgba(255, 255, 255, 0.35);
+    border: 1px solid rgba(139, 115, 85, 0.55);
     text-shadow: none;
     white-space: nowrap;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
 }
 
 .expedition-traveler[data-exp="mendel"] .expedition-traveler-name {
-    border-color: rgba(255, 77, 109, 0.85);
+    border-color: rgba(255, 77, 109, 0.75);
+    color: #3a1a22;
 }
 
 .expedition-traveler[data-exp="nelson"] .expedition-traveler-name {
-    border-color: rgba(255, 193, 77, 0.85);
+    border-color: rgba(200, 140, 40, 0.85);
+    color: #3a2a12;
+}
+
+.expedition-stop-label {
+    position: fixed;
+    transform: translate(-50%, calc(-100% - 14px));
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: #ffffff;
+    background: rgba(18, 14, 10, 0.82);
+    padding: 2px 6px;
+    border-radius: 3px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 154;
+    transition: opacity 0.2s ease;
+}
+
+.expedition-stop-label.pending {
+    opacity: 0.45;
+    filter: grayscale(0.3);
+}
+
+.expedition-stop-label.active {
+    border-color: rgba(255, 220, 140, 0.95);
+    box-shadow: 0 0 0 1px rgba(201, 169, 97, 0.35);
+}
+
+.expedition-stop-label.hidden {
+    opacity: 0;
+    visibility: hidden;
 }
 
 /* UI Overlay */
